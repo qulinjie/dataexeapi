@@ -1,0 +1,5 @@
+.doitphp_calendar{width:100%;border:1px solid #9EC9FE;font-size:12px;line-height:20px;color:#222;height:auto;}
+.doitphp_calendar .menu{background-color:#9EC9FE;color:#FFF;}
+.doitphp_calendar .today{color:#FFF;background-color:#58A0EC;}
+.doitphp_calendar .used a{color:#FFF;background-color:#A5A5A5;display:block;text-decoration:none;}
+.doitphp_calendar .used a:hover{background-color:#58A0EC;}
