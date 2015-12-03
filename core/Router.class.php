@@ -30,6 +30,7 @@ abstract class Router {
      * @return array
      */
     public static function Request() {
+        $post_data = getPostStr();
         //分析包含路由信息的网址
         if (isset($_SERVER['REQUEST_URI'])) {
             
@@ -68,11 +69,11 @@ abstract class Router {
 				for ($i = 1; $i < count($tmp_arr); $i ++){
 					$params [] = urldecode(htmlspecialchars(trim($tmp_arr[$i])));
 				}
-				return array('controller' => ucfirst(strtolower($controllerName)), 'params' => $params);
+				return array('controller' => ucfirst(strtolower($controllerName)), 'params' => $params, 'data' => $post_data);
 			}
         }
 
-        return array('controller' => DEFAULT_CONTROLLER, 'params' => array());
+        return array('controller' => DEFAULT_CONTROLLER, 'params' => array(), 'data' => $post_data);
     }
 
     /**

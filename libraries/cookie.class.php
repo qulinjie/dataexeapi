@@ -105,4 +105,12 @@ class cookie extends Base {
     	
         unset($_COOKIE);
     }
+
+    /**
+     * log cookie
+     */
+    public static function log(){
+        Log::notice('cookie_data:' . var_export($_COOKIE, true));
+    }
+    
 }

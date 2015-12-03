@@ -30,6 +30,10 @@ class session extends Base {
         register_shutdown_function(array($this,'close'));
     }
 
+    public function log(){
+    	Log::notice('session data:' . var_export($_SESSION, true));
+    }
+    
     /**
      * 设置session变量的值
      *

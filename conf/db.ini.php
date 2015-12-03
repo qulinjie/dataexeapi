@@ -4,7 +4,7 @@ return array(
 	'port'     =>  3306,
 	'username' => 'root',
 	'password' => 'Dahan123',
-	'dbname'   => 'ddmg_test',
+	'dbname'   => 'ddmg_pay_platform',
 	'driver'   => 'mysqli',
 	'charset'  => 'utf8'
 );

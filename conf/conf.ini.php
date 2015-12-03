@@ -72,5 +72,40 @@ return array(
 		'token_life_time' => 86400,
 		'xpp_droped_token_session_key' => 'xpp_droped_token_session_key',
 		'xpp_processing_token_session_key' => 'xpp_processing_token_session_key',
+    
+        //sms短信拨号相关参数配置
+        'sms_url' => 'http://110.84.128.78:8088',//请求包请求地址
+        'sms_SmsSign' => 'SmsSign',//签名方式（短信签名时使用）
+        'sms_Spid' => '225448',//注册sp获取的标识
+        'sms_Appid' => '079',
+        'sms_password' => 'Dahan123',//登陆密码
+        'sms_Ims' => '8659188325496',//ims号码
+        'sms_Key' => '61422841',//密钥
+        
+        /*'sms_url' => 'http://open.fjii.com:8088',//请求包请求地址
+         'sms_SmsSign' => 'SmsSign',//签名方式（短信签名时使用）
+        'sms_Spid' => '478877',//注册sp获取的标识  478877
+        'sms_Appid' => '130',//130
+        'sms_password' => 'Isd*@#user',//登陆密码Isd*@#user
+        'sms_Ims' => '8659522947871',//ims号码
+        'sms_Key' => '57915641',//密钥*/
+        
+        'sms_Sign' => '大大买钢',//签名内容
+        
+        'sms_MethodName' => 'SmsSendByTemplet',//发送类型名称（短信发送时使用）
+        'sms_call_MethodName' => 'Dial',//发送类型名称（电话拨号）
+        'sms_modelId' => '10001',//发送短信的模板id
+        'sms_timeout' =>10,//验证码有效时间10分钟
+        'sms_word' =>'欢迎您注册大大买钢！',//欢迎词
+        'sms_type' =>'1',//获取验证码方式1短信2语音
+        'sms_telno' =>'18677059534',//接收验证码方式手机号码
+        'sms_regtype' =>'1_1',//ims号码注册类型1_1：新注册为福建固话1_2注册TELNO号码
+        'sms_cord' =>'',//是否录音1录音，不填不录音
+        'sms_potinsspid'=>100354,
+        //短信推送代理IP地址
+        'proxy_ip' => '',//10.44.82.155
+        'proxy_port'=>'',//3128
+        
+    
 );
 ?>

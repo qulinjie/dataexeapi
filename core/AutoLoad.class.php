@@ -81,6 +81,7 @@ class AutoLoad {
     'http'              => 'libraries/http.class.php',
     'wsdl'              => 'libraries/wsdl.class.php',
     'encrypt'           => 'libraries/encrypt.class.php',
+    'sms'               => 'libraries/sms.class.php',
     'cache_apc'         => 'libraries/cache/cache_apc.class.php',
     'cache_eaccelerator'=> 'libraries/cache/cache_eaccelerator.class.php',
     'db_sqlite'         => 'core/db/db_sqlite.class.php',
@@ -89,6 +90,7 @@ class AutoLoad {
     'db_postgres'       => 'core/db/db_postgres.class.php',
     'db_mssql'          => 'core/db/db_mssql.class.php',
     'db_mongo'          => 'core/db/db_mongo.class.php', 
+    'request_log'		=>	'libraries/request_log.class.php',
     'session_redis'     => 'libraries/session_redis.class.php',
     'processlock'     => 'libraries/processlock.class.php', 
     'request_log'     => 'libraries/request_log.class.php'
