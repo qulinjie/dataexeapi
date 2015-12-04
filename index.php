@@ -200,7 +200,6 @@ abstract class doit {
      * @return object
      */
     public static function run() {
-
         //定义变量_app
         static $_app = array();
 
@@ -209,7 +208,22 @@ abstract class doit {
         
         self::$controller = $url_params['controller'];
         self::$params     = $url_params['params'];
-        $appId = self::$controller . '_' . implode('_', self::$params);
+        
+        $data = json_decode($url_params['data'],true);
+        Log::notice("url_params====================>>>data=##" . json_encode($data) . "##");
+        
+        //判断是否是
+        if(self::$params[0] != 'getbill' && self::$params[0] != 'getcallstatus'){
+            foreach ( ['caller', 'callee', 'timestamp', 'eventid'] as $val ){
+                if ( !$data[$val] ) {
+                    Log::error('require header info: caller, callee, timestamp and eventid');
+                    EC::fail(EC_PAR_BAD);
+                }
+                self::$$val = $data[$val];
+            }
+        }
+        self::$req_data	= $data['data'] ? $data['data'] : [];
+        $appId = self::$controller . '_' . implode('_', self::$params) . $url_params['data'];
         
         if (!isset($_app[$appId])) {
 
@@ -231,7 +245,8 @@ abstract class doit {
             //创建一个页面控制对象
             $appObject = new $controller();
 
-            $_app[$appId] = $appObject->handle(self::$params);
+            Log::notice("data====================>>>req_data=##" . json_encode(self::$req_data) . "##");
+            $_app[$appId] = $appObject->handle(self::$params, self::$req_data);
         }
 
         return $_app[$appId];
@@ -344,6 +359,17 @@ session_redis::init();
  */
 EC::load();
 
+function getPostStr(){
+    //获取POST数据
+    $post_data_1 = file_get_contents("php://input");
+    $post_data_2 = $GLOBALS['HTTP_RAW_POST_DATA'];
+    $post_data = $post_data_1 == '' ? $post_data_2 : $post_data_1;
+//     Log::notice("req_data====================>>>post_data=" . json_encode($post_data));
+    return $post_data;
+}
+
+//记录请求
+$request_log_obj = new request_log($_SERVER['REQUEST_URI'], getPostStr());
 
 /**
  * 加载error code
