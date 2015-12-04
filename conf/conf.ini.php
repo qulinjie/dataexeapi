@@ -34,27 +34,29 @@ return array(
 		'smtp_password' => 'Isd!@#user',
 		'smtp_sender' => 'nonreply@xplusplus.cn',
 		
-		'page_count_default' => 3,
+		'page_count_default' => 10,
 		
-		'code_expire'	=> 86400,//one day
-		'code_length'	=> 16,
+        'code_expire'	=> 600,//one day
+        'code_length'	=> 6,
+        'resend_after'	=> 50,
+    
 		'register_mail_template_subject'	=> '【xplusplus.cn】验证邮箱',
 		'register_mail_template_content'	=> 'hi, %s：<BR><BR>请点击下面链接验证您的xplusplus.cn邮箱：<BR><a href="' . Router::getDomainAndBaseUrl() .
-		'user/verify_register/%s">' . Router::getDomainAndBaseUrl() .'user/verify_register/%s</a><BR><BR>' .
-		'如果链接无法点击，复制链接到浏览器地址栏访问即可。<BR>' .
-		'这是<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a>自动发送的邮件，请不要回复。<BR>' .
-		'-------------<BR>' .
-		'<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a> - IT技术精英的知识分享社区<BR>' . 
-		date('Y年m月d日'),
-		
-		'alter_mail_template_subject'	=> '【xplusplus.cn】验证更改后的邮箱',
-		'alter_mail_template_content'	=> 'hi, %s：<BR><BR>请点击下面链接验证您的xplusplus.cn新邮箱：<BR><a href="' . Router::getDomainAndBaseUrl() .
-		'user/verify_alter/%s">' . Router::getDomainAndBaseUrl() .'user/verify_alter/%s</a><BR><BR>' .
-		'如果链接无法点击，复制链接到浏览器地址栏访问即可。<BR>' .
-		'这是<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a>自动发送的邮件，请不要回复。<BR>' .
-		'-------------<BR>' .
-		'<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a> - IT技术精英的知识分享社区<BR>' . 
-		date('Y年m月d日'),
+                                        		'user/verify_register/%s">' . Router::getDomainAndBaseUrl() .'user/verify_register/%s</a><BR><BR>' .
+                                        		'如果链接无法点击，复制链接到浏览器地址栏访问即可。<BR>' .
+                                        		'这是<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a>自动发送的邮件，请不要回复。<BR>' .
+                                        		'-------------<BR>' .
+                                        		'<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a> - IT技术精英的知识分享社区<BR>' . 
+                                        		date('Y年m月d日'),
+                                        		
+                                        		'alter_mail_template_subject'	=> '【xplusplus.cn】验证更改后的邮箱',
+                                        		'alter_mail_template_content'	=> 'hi, %s：<BR><BR>请点击下面链接验证您的xplusplus.cn新邮箱：<BR><a href="' . Router::getDomainAndBaseUrl() .
+                                        		'user/verify_alter/%s">' . Router::getDomainAndBaseUrl() .'user/verify_alter/%s</a><BR><BR>' .
+                                        		'如果链接无法点击，复制链接到浏览器地址栏访问即可。<BR>' .
+                                        		'这是<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a>自动发送的邮件，请不要回复。<BR>' .
+                                        		'-------------<BR>' .
+                                        		'<a href="' . Router::getDomainAndBaseUrl() . '">xplusplus.cn</a> - IT技术精英的知识分享社区<BR>' . 
+                                        		date('Y年m月d日'),
 		
 		'find_password_mail_template_subject' => '【xplusplus.cn】找回密码',
 		'find_password_mail_template_content' => 'hi, %s：<BR><BR>请点击下面链接找回您的xplusplus.cn密码：<BR><a href="' . Router::getDomainAndBaseUrl() .
