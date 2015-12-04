@@ -10,6 +10,12 @@ class UserController extends Controller {
             case "register":
                 $this->register($req_data);
                 break;
+            case "login":
+                $this->login($req_data);
+                break;
+            case "login_out":
+                $this->loginOut($req_data);
+                break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -17,6 +23,84 @@ class UserController extends Controller {
 		}	
 	}
 
+	private function login($req_data){
+	    $tel = $req_data['tel'];
+	    $pwd = $req_data['pwd'];
+	
+	    if( !$tel || ! $pwd){
+	        Log::error('login . params err .');
+	        EC::fail(EC_PAR_BAD);
+	    }
+	
+	    $user_model = $this->model('user');
+	    $user_info = $user_model->getUserInfoByTel($tel,array(),true);
+	    
+	    if(empty($user_info) ) {
+	        Log::error('login . user not exsit . ');//用户不存在
+	        EC::fail(EC_LOGIN_PAR_REC);
+	    } else if($user_info['status'] == '2') {
+			Log::error('login . user disable! id=' . $user_info['id']);
+			EC::fail(EC_USE_UNA);			
+		}
+	    if(UserController::buildPassword($user_info['id'], $pwd) != $user_info['password']){
+	        Log::error('login . pwd error');//密码错误
+	        EC::fail(EC_LOGIN_PAR_REC);
+	    }
+	     
+	    //设置已登录
+	    $this->setLoginSession($user_info);
+	     
+	    $session = Controller::instance('session');
+	    unset( $user_info['password'] );
+	    $session->set('loginUser', $user_info);
+	
+	    Log::notice('end login . sessionId=' . $session->get_id() );
+	    // check
+	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('loginUser')) );
+	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('loginUser')) );
+	
+	    EC::success(EC_OK,$user_info);
+	}
+	
+	private function loginOut(){
+	    try{
+    	    $session = Controller::instance( 'session' );
+    	    $user_id = $session->get('id');
+    	    Log::notice("loginOut . user_id=" . $user_id);
+    	    
+    	    $session->clear();//清空session
+    	    $session->destroy();//清空session
+    	    $cookie = $this->instance('cookie');
+    	    $cookie->clear(Router::getBaseUrl());//清空cookie
+	    } catch (Exception $e) {
+	        Log::error('loginOut . e=' . $e->getMessage());
+	    }
+	    EC::success(EC_OK);
+	}
+	
+	private function setLoginSession($session_data = array()){
+	    $session = Controller::instance( 'session' );
+	    $session->clear();
+	    $session->set('id', $session_data['id']);
+	    $session->set('tel', $session_data['tel']);
+	    $session->set('auth_id', $session_data['auth_id']);
+	    $session->set('name', $session_data['name']);
+	    unset( $session_data['password'] );
+	    $session->set('loginUser', $session_data);
+	}
+	
+	public static function buildPassword($id, $pwd){
+	    $conf_arr = Controller::getConfig('conf');
+	    $pi_key = openssl_pkey_get_private($conf_arr['private_key']);
+	    //解析密码
+	    $pwd = base64_decode($pwd);
+	    $decrypted_pwd = '';
+	    //解密密码
+	    openssl_private_decrypt($pwd, $decrypted_pwd, $pi_key);
+	    Log::notice('--------------decrypted_pwd---buildPassword-----params==>>' . var_export($decrypted_pwd, true) . ' ,id=' . $id . ' ,MD5_pwd=' . md5($id . $decrypted_pwd));
+	    return md5($id . $decrypted_pwd);
+	}
+	
 	private function register($req_data){
 	    $tel = $req_data['tel'];
 	    $pwd = $req_data['pwd'];
@@ -51,19 +135,9 @@ class UserController extends Controller {
 	        EC::fail(EC_USE_UNA);
 	    }
 	
-	    $conf_arr = $this->getConfig('conf');
-	    $pi_key = openssl_pkey_get_private($conf_arr['private_key']);
-	    //解析密码
-	    Log::notice('request param . pwd=' . $pwd);
-	    $pwd = base64_decode($pwd);
-	    $decrypted_pwd = '';
-	    //解密密码
-	    openssl_private_decrypt($pwd, $decrypted_pwd, $pi_key);
-	    Log::notice('decrypt pwd=' . $decrypted_pwd);
-	
 	    $user_id = $this->model('id')->getUserId();
 	    //密码md5加密
-	    $md5_pwd = md5($user_id . $decrypted_pwd);
+	    $md5_pwd = UserController::buildPassword($user_id, $pwd);
 	    
 	    //注册用户写入数据库
 	    if(! $user_model->createUser(array(
