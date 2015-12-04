@@ -5,6 +5,14 @@ class VerifyModel extends Model{
 		return 'c_verify';
 	}
 	
+	/**
+	 * 添加 验证码
+	 * @param unknown $tel
+	 * @param unknown $code
+	 * @param unknown $expire_time
+	 * @param unknown $resend_after
+	 * @param number $check_time
+	 */
 	public function addVerify($tel, $code, $expire_time, $resend_after, $check_time = 0){
 		return $this->insert(array(
                     				'tel' => $tel, 
@@ -16,15 +24,32 @@ class VerifyModel extends Model{
 		                          ));
 	}
 	
+	/**
+	 * 更新 验证码
+	 * @param unknown $tel
+	 * @param unknown $code
+	 * @param unknown $expire_time
+	 * @param unknown $resend_after
+	 * @param number $check_time
+	 */
 	public function updateVerify($tel, $code, $expire_time, $resend_after, $check_time = 0){
-		return $this->update(array('code' => $code, 
-				'expire_time' => $expire_time, 
-				'resend_after' => $resend_after,
-				'check_time' => $check_time), array('tel' => $tel));
+		return $this->update(array(
+                    		        'code' => $code, 
+                    				'expire_time' => $expire_time, 
+                    				'resend_after' => $resend_after,
+                    				'check_time' => $check_time
+                        		  ), 
+    		                      array('tel' => $tel));
 	}
-	/*
-	*手机验证码表的更新或添加
-	*/
+	
+    /**
+     * 更新或添加 验证码
+     * @param unknown $tel
+     * @param unknown $code
+     * @param unknown $expire_time
+     * @param unknown $resend_after
+     * @param number $check_time
+     */
 	public function replaceVerify($tel, $code, $expire_time, $resend_after, $check_time = 0){
 		$cnt = $this->where('tel=?', $tel)->count();
 		if($cnt){
@@ -37,7 +62,7 @@ class VerifyModel extends Model{
 	public function setCheckTime($tel, $check_time){
 		$cnt = $this->where('tel=?', $tel)->count();
 		if(! $cnt) {
-			Log::error('verify record not exist!');
+			Log::error('verify record not exist! tel=' . $tel);
 			Log::error('error:' . $this->getErrorInfo());
 			return false;
 		}
@@ -51,7 +76,7 @@ class VerifyModel extends Model{
 			$data = $this->where('tel=?', $tel)->order('add_timestamp desc')->limit(0,1)->from(null, $fields)->select();
 		}
 		if(!count($data)) {
-			Log::error('verify record not exist!');
+			Log::error('verify record not exist! tel=' . $tel);
 			Log::error('error:' . $this->getErrorInfo());
 			return array();
 		}
@@ -71,6 +96,10 @@ class VerifyModel extends Model{
 		else return $this->update(array('check_time' => $check_time), array('tel'=>$tel));
 	}*/
 	
+	/**
+	 * 判断 验证码 是否已存在
+	 * @param unknown $code
+	 */
 	public function checkCodeExist($code){
 		return (0 < $this->where(array('code' => $code))->count());
 	}
