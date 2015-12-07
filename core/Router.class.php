@@ -69,7 +69,8 @@ abstract class Router {
 				for ($i = 1; $i < count($tmp_arr); $i ++){
 					$params [] = urldecode(htmlspecialchars(trim($tmp_arr[$i])));
 				}
-				return array('controller' => ucfirst(strtolower($controllerName)), 'params' => $params, 'data' => $post_data);
+// 				return array('controller' => ucfirst(strtolower($controllerName)), 'params' => $params, 'data' => $post_data);
+				return array('controller' => ucfirst($controllerName), 'params' => $params, 'data' => $post_data);
 			}
         }
 

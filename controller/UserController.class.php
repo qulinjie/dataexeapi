@@ -90,6 +90,7 @@ class UserController extends Controller {
 	}
 	
 	public static function buildPassword($id, $pwd){
+// 	    return "123456";// TODO for test
 	    $conf_arr = Controller::getConfig('conf');
 	    $pi_key = openssl_pkey_get_private($conf_arr['private_key']);
 	    //解析密码

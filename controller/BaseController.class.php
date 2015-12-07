@@ -171,4 +171,16 @@ abstract class BaseController extends Controller
 	  die( json_encode( ['code'=>$code, 'msg'=>$msg, 'data'=>$data]) );
 	}
 
+	protected function getLoginUser()
+	{
+	    $session = Controller::instance('session');
+	    return $session->get('loginUser');
+	}
+	
+	protected function getLoginUserId()
+	{
+	    $loginUserInfo = $this->getLoginUser();
+	    return $loginUserInfo['id'];
+	}
+	
 }
