@@ -12,8 +12,11 @@ class AuthorizationCodeController extends BaseController {
             EC::fail(EC_MTD_NON);
         } else {
             switch ($params[0]) {
+                case 'searchCnt':
+                    $this->getSearchCnt($req_data);
+                    break;
                 case 'searchList':
-                    $this->searchList($req_data);
+                    $this->getSearchList($req_data);
                     break;
                 default:
                     Log::error('page not found . ' . $params[0]);
@@ -23,6 +26,26 @@ class AuthorizationCodeController extends BaseController {
         }
     }
     
+    public function getSearchCnt($req_data){
+        $code_model = $this->model('authorizationCode');
+        $data = $code_model->getSearchCnt($req_data);
+        EC::success(EC_OK,$data);
+    }
+    
+    public function getSearchList($req_data){
+        $current_page = $req_data['current_page'];
+        $page_count = $req_data['page_count'];
+        unset($req_data['current_page']);
+        unset($req_data['page_count']);
+        $params = $req_data;
+    
+        $code_model = $this->model('authorizationCode');
+        $data = $code_model->getSearchList($params, $current_page, $page_count);
+    
+        EC::success(EC_OK,$data);
+    }
+    
+    /* 
     protected function searchList()
     {
         // 获取查询条件
@@ -48,9 +71,6 @@ class AuthorizationCodeController extends BaseController {
     
         Log::notice('success  ==== >>> data=' . json_encode($data));
         EC::success(EC_OK, $data); 
-        
-        $orderList_html = $this->render('authoriCodeList', $data, true);
-        $this->render( 'index', array( 'page_type'=>'authoriCodeList', 'authoriCodeList_html'=>$orderList_html ) );
     }
     
     private function getConditionArr()
@@ -99,6 +119,6 @@ class AuthorizationCodeController extends BaseController {
     
         Log::notice('getConditionArr ==== >>> condition=' . json_encode($conditionArr) . ',params=' . json_encode($params) );
         return ['condition'=>$conditionArr, 'params'=>$params];
-    }
+    } */
     
 }
