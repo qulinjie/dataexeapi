@@ -225,6 +225,7 @@ abstract class doit {
         self::$req_data	= $data['data'] ? $data['data'] : [];
         $appId = self::$controller . '_' . implode('_', self::$params) . $url_params['data'];
         
+        Log::notice("isset====================>>>appId=##" . json_encode($appId) . "##");
         if (!isset($_app[$appId])) {
 
             //通过实例化及调用所实例化对象的方法,来完成controller中action页面的加载
@@ -248,7 +249,7 @@ abstract class doit {
             Log::notice("data====================>>>req_data=##" . json_encode(self::$req_data) . "##");
             $_app[$appId] = $appObject->handle(self::$params, self::$req_data);
         }
-
+        Log::notice("is-not-set====================>>>appId=##" . json_encode($appId) . "##");
         return $_app[$appId];
     }
 
