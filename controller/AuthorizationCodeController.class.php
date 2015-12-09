@@ -8,7 +8,7 @@ class AuthorizationCodeController extends BaseController {
 
      public function handle($params = array(), $req_data = array()) {
         if (empty($params)) {
-            Log::error('AuthorizationCodeController . params is empty . ');
+            Log::error('Controller . params is empty . ');
             EC::fail(EC_MTD_NON);
         } else {
             switch ($params[0]) {

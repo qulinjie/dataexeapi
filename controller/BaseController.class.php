@@ -183,4 +183,13 @@ abstract class BaseController extends Controller
 	    return $loginUserInfo['id'];
 	}
 	
+	protected function getPostStr(){
+	    //获取POST数据
+	    $post_data_1 = file_get_contents("php://input");
+	    $post_data_2 = $GLOBALS['HTTP_RAW_POST_DATA'];
+	    $post_data = $post_data_1 == '' ? $post_data_2 : $post_data_1;
+	    Log::notice("req_data====================>>>post_data=" . json_encode($post_data));
+	    return $post_data;
+	}
+	
 }
