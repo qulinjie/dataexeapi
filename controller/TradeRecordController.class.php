@@ -26,12 +26,18 @@ class TradeRecordController extends BaseController {
     public function create($req_data){
         $id = $this->model('id')->getTradeRecordId();
         $req_data['id'] = $id;
+        
         $tradeRecord_model = $this->model('tradeRecord');
+        
+        $tradeRecord_model->startTrans(); // 事务开始
+        
         $data = $tradeRecord_model->createTradeRecord($req_data);
         if(false === $data){
             Log::error('createTradeRecord Fail!');
             EC::fail(EC_ADD_REC);
         }
+        
+        $tradeRecord_model->commit(); // 事务提交
         EC::success(EC_OK,$id);
     }
     
