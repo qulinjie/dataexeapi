@@ -11,7 +11,7 @@ class IdModel extends Model{
 	}
 	
 	public function getUserId(){
-		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='user_id'";
+		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_user'";
 		$this->execute($sql);
 		return (self::$_user_id_offset + $this->db->insertId());
 	}
@@ -23,7 +23,7 @@ class IdModel extends Model{
 	}
 
 	public function getCertificationId(){
-		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='certification_id'";
+		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_certification'";
 		$this->execute($sql);
 		return (self::$_certification_id_offset + $this->db->insertId());
 	}
