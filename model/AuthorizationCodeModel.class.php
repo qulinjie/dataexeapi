@@ -20,7 +20,6 @@ class AuthorizationCodeModel extends Model {
 	
 	
 	public function getSearchCnt($params = array()){
-	    
 	    $keys = array();
 	    $values = array();
 	    
