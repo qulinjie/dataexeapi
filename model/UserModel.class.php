@@ -135,7 +135,8 @@ class UserModel extends Model {
                 		        'nicename'	=>	$param['name'],
                 		        'pay_password' => '',
                 				'status'	=>	1,
-                				'authentication_status'	=>	1,
+                				'personal_authentication_status'	=>	1,
+								'company_authentication_status'	    =>	1,
                 				'add_timestamp' => date('Y-m-d H:i:s',time())
                 		  ))
 		    ){
@@ -208,6 +209,24 @@ class UserModel extends Model {
 			Log::warning('feature bit already set, user id: ' . $user_id . ' number:' . $i);
 		}
 		return true;
+	}
+
+	/**
+	 * @param $status
+	 * @param $id
+	 * @return bool
+	 */
+	public function updatePersonalAuth($status,$id){
+		return $this->update(array('personal_authentication_status' => $status),array('id' => $id));
+	}
+
+	/**
+	 * @param $status
+	 * @param $id
+	 * @return bool
+	 */
+	public function updateCompanyAuth($status,$id){
+		return $this->update(array('company_authentication_status' => $status),array('id' => $id));
 	}
 	
 }
