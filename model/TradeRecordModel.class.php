@@ -117,7 +117,7 @@ class TradeRecordModel extends Model {
 	}
 	
 	public function updateTradeRecord($param, $where){
-	    Log::notice('update ==== >>> where=' . json_encode($where) );
+	    Log::notice('update ==== >>> where=' . json_encode($where) . ',param=' . json_encode($param));
 	    if(empty($where)){
 	        Log::error('!!! upate all rows of record .');
 	        return false;

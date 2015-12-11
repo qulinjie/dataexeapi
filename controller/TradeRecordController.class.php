@@ -27,6 +27,9 @@ class TradeRecordController extends BaseController {
                 case 'create':  // 不需要 登录
                     $this->create($req_data);
                     break;
+                case 'pay':
+                    $this->pay($req_data);
+                    break;
                 default:
                     Log::error('page not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -60,8 +63,8 @@ class TradeRecordController extends BaseController {
         unset($req_data['id']);
         unset($req_data['user_id']);
     
-        $code_model = $this->model('tradeRecord');
-        $res = $code_model->updateTradeRecord($req_data,array('id' => $id,'user_id' => $user_id));
+        $tradeRecord_model = $this->model('tradeRecord');
+        $res = $tradeRecord_model->updateTradeRecord($req_data,array('id' => $id,'user_id' => $user_id));
         if(false === $res){
             Log::error('updateTradeRecord faild !');
             EC::fail(EC_UPD_REC);
@@ -107,6 +110,51 @@ class TradeRecordController extends BaseController {
         $tradeRecord_model->commit(); // 事务提交
         
         EC::success(EC_OK,$id);
+    }
+    
+    public function pay($req_data){
+        $tradeRecord_model = $this->model('tradeRecord');
+        $id = $req_data['id'];
+        $user_id = $req_data['user_id'];
+        
+        $tradeRecord_model->startTrans(); // 事务开始
+    
+        /*
+         * 增加 资金流失记录表
+        */
+//         $code_model = $this->model('authorizationCode');
+//         $params = array();
+//         $params['used_count'] = ((int)$req_data['code_used_count']) + 1;
+//         $res = $code_model->updateAuthCode($params,array('id' => $req_data['code_id']));
+//         if(false === $res){
+//             Log::error('updateAuthCode faild ! rollback .');
+//             $tradeRecord_model->rollback(); // 事务回滚
+//             EC::fail(EC_UPD_REC);
+//         }
+    
+        // TODO 
+        /**
+         * 支付（转账）
+         */
+        
+        
+        /*
+         * 修改 代付款订单 状态
+         */
+        $params = array();
+        $params['order_status'] = $req_data['order_status'];
+        $params['disenabled_timestamp'] = $req_data['disenabled_timestamp'];
+        
+        $tradeRecord_model = $this->model('tradeRecord');
+        $res = $tradeRecord_model->updateTradeRecord($params,array('id' => $id,'user_id' => $user_id));
+        if(false === $res){
+            Log::error('updateTradeRecord faild !');
+            $tradeRecord_model->rollback(); // 事务回滚
+            EC::fail(EC_UPD_REC);
+        }
+        $tradeRecord_model->commit(); // 事务提交
+    
+        EC::success(EC_OK);
     }
     
 }
