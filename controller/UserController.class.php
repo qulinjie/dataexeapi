@@ -13,6 +13,12 @@ class UserController extends Controller {
             case "login":
                 $this->login($req_data);
                 break;
+			case "is_login":
+				$this->isLogin($req_data);
+				break;
+			case "get_login_user":
+				$this->getLoginUser($req_data);
+				break;
             case "login_out":
                 $this->loginOut($req_data);
                 break;
@@ -358,5 +364,22 @@ class UserController extends Controller {
 
         EC::success(EC_OK);
     }
+
+	private function isLogin($req_data)
+	{
+		$session = self::instance('session');
+		$data ['isLogin'] = $session->get('loginUser') ? 1 : 0;
+		EC::success(EC_OK,$data);
+	}
+
+	private function getLoginUser($req_data)
+	{
+		$session = self::instance('session');
+		if(!$data ['loginUser'] = $session->get('loginUser')){
+			$data ['loginUser'] = [];
+		}
+
+		EC::success(EC_OK,$data);
+	}
 
 }
