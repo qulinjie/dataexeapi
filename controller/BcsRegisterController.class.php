@@ -3,11 +3,11 @@
  * @author zhangkui
  *
  */
-class BcsCustomerController extends BaseController {
+class BcsRegisterController extends BaseController {
 
      public function handle($params = array(), $req_data = array()) {
         if (empty($params)) {
-            Log::error('Controller . params is empty . ');
+            Log::error('BcsRegisterController . params is empty . ');
             EC::fail(EC_MTD_NON);
         } else {
             switch ($params[0]) {
@@ -35,7 +35,7 @@ class BcsCustomerController extends BaseController {
     }
     
     public function getSearchCnt($req_data){
-        $code_model = $this->model('bcsCustomer');
+        $code_model = $this->model('bcsRegister');
         $data = $code_model->getSearchCnt($req_data);
         EC::success(EC_OK,$data);
     }
@@ -47,7 +47,7 @@ class BcsCustomerController extends BaseController {
         unset($req_data['page_count']);
         $params = $req_data;
     
-        $code_model = $this->model('bcsCustomer');
+        $code_model = $this->model('bcsRegister');
         $data = $code_model->getSearchList($params, $current_page, $page_count);
     
         EC::success(EC_OK,$data);
@@ -57,27 +57,27 @@ class BcsCustomerController extends BaseController {
         $user_id = $req_data['user_id'];
         unset($req_data['user_id']);
     
-        $bcsCustomer_model = $this->model('bcsCustomer');
-        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
+        $bcsRegister_model = $this->model('bcsRegister');
+        $res = $bcsRegister_model->updateBcsRegister($req_data,array('user_id' => $user_id));
         if(false === $res){
-            Log::error('updateBcsCustomer faild !');
+            Log::error('updateBcsRegister faild !');
             EC::fail(EC_UPD_REC);
         }
         EC::success(EC_OK);
     }
     
     public function getInfo($req_data){
-        $code_model = $this->model('bcsCustomer');
-        $data = $code_model->getInfoBcsCustomer($req_data, array());
+        $code_model = $this->model('bcsRegister');
+        $data = $code_model->getInfoBcsRegister($req_data, array());
         EC::success(EC_OK,$data);
     }
     
     public function create($req_data){
-        $id = $this->model('id')->getBcsCustomerId();
+        $id = $this->model('id')->getBcsRegisterId();
         $req_data['id'] = $id;
         
-        $bcsCustomer_model = $this->model('bcsCustomer');
-        $bcsCustomer_model->startTrans(); // 事务开始
+        $bcsRegister_model = $this->model('bcsRegister');
+        $bcsRegister_model->startTrans(); // 事务开始
 
         /*
          * 修改授权码 ，已使用次数 +1
@@ -88,20 +88,20 @@ class BcsCustomerController extends BaseController {
         $res = $code_model->updateAuthCode($params,array('id' => $req_data['code_id']));
         if(false === $res){
             Log::error('updateAuthCode faild ! rollback .');
-            $bcsCustomer_model->rollback(); // 事务回滚
+            $bcsRegister_model->rollback(); // 事务回滚
             EC::fail(EC_UPD_REC);
         }
         
         /*
          * 增加 代付款订单  
          */
-        $data = $bcsCustomer_model->createBcsCustomer($req_data);
+        $data = $bcsRegister_model->createBcsRegister($req_data);
         if(false === $data){
-            Log::error('createBcsCustomer Fail! rollback .');
-            $bcsCustomer_model->rollback(); // 事务回滚
+            Log::error('createBcsRegister Fail! rollback .');
+            $bcsRegister_model->rollback(); // 事务回滚
             EC::fail(EC_ADD_REC);
         }
-        $bcsCustomer_model->commit(); // 事务提交
+        $bcsRegister_model->commit(); // 事务提交
         
         EC::success(EC_OK,$id);
     }
