@@ -7,7 +7,7 @@ class BcsRegisterController extends BaseController {
 
      public function handle($params = array(), $req_data = array()) {
         if (empty($params)) {
-            Log::error('BcsRegisterController . params is empty . ');
+            Log::error('Controller . params is empty . ');
             EC::fail(EC_MTD_NON);
         } else {
             switch ($params[0]) {
