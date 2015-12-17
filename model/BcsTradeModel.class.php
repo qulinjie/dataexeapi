@@ -131,7 +131,7 @@ class BcsTradeModel extends Model {
 	}
 	
 	public function createBcsTrade($param = array()){
-	    Log::notice('createBcsTrade ==== >>> param=' . json_encode($param) );
+	    Log::notice('create ==== >>> param=' . json_encode($param) );
 	    if(! $this->insert(array(
 	        'id'   =>	$param['id'],
 	        'b_user_id' => $param['b_user_id'],

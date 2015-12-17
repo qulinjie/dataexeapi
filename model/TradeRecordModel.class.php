@@ -140,6 +140,7 @@ class TradeRecordModel extends Model {
 	}
 	
 	public function createTradeRecord($param = array()){
+	    Log::notice('create ==== >>> param=' . json_encode($param) );
 	    if(! $this->insert(array(
 	        'id'   =>	$param['id'],
 	        'user_id' => $param['user_id'],
@@ -161,7 +162,7 @@ class TradeRecordModel extends Model {
 	        'order_status'	=>	$param['order_status'],
 	        'pay_timestamp'	=>	$param['pay_timestamp'],
 	        'comment'	=>	$param['comment'],
-	        'is_delete'	=>	BcsTradeModel::$_is_delete_false,
+	        'is_delete'	=>	TradeRecordModel::$_is_delete_false,
 	        'add_timestamp' => date('Y-m-d H:i:s',time())
 	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());

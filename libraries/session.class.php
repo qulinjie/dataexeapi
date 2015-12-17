@@ -31,7 +31,7 @@ class session extends Base {
     }
 
     public function log(){
-    	Log::notice('session data:' . var_export($_SESSION, true));
+//     	Log::notice('session data:' . var_export($_SESSION, true));
     }
     
     /**
