@@ -28,6 +28,12 @@ class UserController extends Controller {
 			case 'update_company_auth_info': //更新企业认证信息
 				$this->updateCompanyAuthInfo($req_data);
 				break;
+			case 'set_password': //设置密码
+				$this->setPassword($req_data);
+				break;
+			case 'find_password': //找回密码
+				$this->findPassword($req_data);
+				break;
 			case "getUserBasicInfo":
 			    $this->getUserBasicInfo($req_data);
 			    break;
@@ -127,20 +133,9 @@ class UserController extends Controller {
 	        EC::fail(EC_PAR_BAD);
 	    }
 
-	    //确保手机号验证过并且未过期
-	    $verify_model = $this->model('verify');
-	    $verify_data  = $verify_model->getVerifyRecordByTel($tel,$code);
-		Log::error('RequestData:====='.json_encode($verify_data));
-
-	    //是否验证通过
-	    if(empty($verify_data) ){//暂时注释|| $verify_data['check_time'] == '0000-00-00 00:00:00'){
-	        Log::error('phone number not verified . tel=' . $tel . ',check_time=' . $verify_data['check_time']);
-	        EC::fail(EC_NOT_VFY);
-	    }
-	    if(strtotime($verify_data['expire_time']) < time()){
-	        Log::error('code is time out verify . tel=' . $tel . ',expire_time=' . $verify_data['expire_time']);
-	        EC::fail(EC_VFY_EPR);
-	    }
+	    //检查验证码
+	    $checkCmsCodeRes = $this->checkCmsCode($tel,$code);
+		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
 
 	    //判断用户是否已存在(没注册过或者未被删除)
 	    $user_model = $this->model('user');
@@ -308,6 +303,28 @@ class UserController extends Controller {
 	}
 
 	/**
+	 * 检查验证码
+	 * @param $tel
+	 * @param $code
+	 * @return int
+	 */
+	private function checkCmsCode($tel,$code){
+		$verify_model = $this->model('verify');
+		$verify_data  = $verify_model->getVerifyRecordByTel($tel,$code);
+
+		//是否验证通过
+		if(empty($verify_data) ){//暂时注释|| $verify_data['check_time'] == '0000-00-00 00:00:00'){
+			Log::error('phone number not verified . tel=' . $tel . ',check_time=' . $verify_data['check_time']);
+			return EC_NOT_VFY;
+		}
+		if(strtotime($verify_data['expire_time']) < time()){
+			Log::error('code is time out verify . tel=' . $tel . ',expire_time=' . $verify_data['expire_time']);
+			return EC_VFY_EPR;
+		}
+		return EC_OK;
+	}
+
+	/**
 	 * @param $req_data['realName','filePath','fileName','id']
 	 */
     private function updatePersonalAuthInfo($req_data) {
@@ -385,11 +402,67 @@ class UserController extends Controller {
 		EC::success(EC_OK,$data);
 	}
 
+
+	private function setPassword($req_data)
+	{
+		if(!$req_data['oldPwd'] || !$req_data['newPwd']){
+			Log::error('setPassword input parameter error');
+			EC::fail(EC_PAR_BAD);
+		}
+
+		$session = self::instance('session');
+		if(!$loginUser = $session->get('loginUser')){
+			Log::error('setPassword not Login');
+			EC::fail(EC_NOT_LOGIN);
+		}
+
+		$basicInfo = $this->model('user')->getUserBasicInfo($loginUser['id']);
+		if($basicInfo['password'] != self::buildPassword($basicInfo['id'], $req_data['oldPwd'])){
+			Log::error('setPassword oldPassword error');
+			EC::fail(EC_PWD_WRN);
+		}
+
+		$params = array('password' => self::buildPassword($basicInfo['id'],$req_data['newPwd']));
+
+
+		if(!$this->model('user')->updateUser($params,array('id' => $basicInfo['id']))){
+			Log::error('setPassword update password error msg('.$this->model('user')->getErrorInfo().')');
+			EC::fail(EC_PWD_UPD);
+		}
+
+		EC::success(EC_OK);
+	}
+
+	private function findPassword($req_data)
+	{
+		$keys = ['account','name','tel','code','auth_filename','auth_filepath',];
+		foreach($keys as $key => $val){
+			if(!isset($req_data[$val])||!$req_data[$val]){
+				EC::fail(EC_PAR_BAD);
+			}
+			$params [$val] = $req_data[$val];
+		}
+
+
+		//检查验证码
+		$checkCmsCodeRes = $this->checkCmsCode($params['tel'],$params['code']);
+		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
+
+		$params['status']       = 1;
+		$params['add_timestamp']= date('Y-m-d H:i:s');
+
+		if(!$this->model('findPassword')->add($params)){
+			Log::error('add findPassword is fail msg('.$this->model('findPassword')->getErrorInfo().')');
+			EC::fail(EC_ADD_FAI);
+		}
+
+		EC::success(EC_OK);
+	}
+
 	private function getUserBasicInfo($req_data)
 	{
 	    $user_model = $this->model('user');
 	    $user_info = $user_model->getUserBasicInfo($req_data['id'],array(),true);
 	    EC::success(EC_OK,$user_info);
 	}
-	
 }
