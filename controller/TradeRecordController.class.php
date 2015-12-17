@@ -114,29 +114,23 @@ class TradeRecordController extends BaseController {
     
     public function pay($req_data){
         $tradeRecord_model = $this->model('tradeRecord');
+        $bcsTrade_model = $this->model('bcsTrade');
+        
         $id = $req_data['id'];
         $user_id = $req_data['user_id'];
         
-        $tradeRecord_model->startTrans(); // 事务开始
-    
-        /*
-         * 增加 资金流失记录表
-        */
-//         $code_model = $this->model('authorizationCode');
-//         $params = array();
-//         $params['used_count'] = ((int)$req_data['code_used_count']) + 1;
-//         $res = $code_model->updateAuthCode($params,array('id' => $req_data['code_id']));
-//         if(false === $res){
-//             Log::error('updateAuthCode faild ! rollback .');
-//             $tradeRecord_model->rollback(); // 事务回滚
-//             EC::fail(EC_UPD_REC);
-//         }
-    
-        // TODO 
         /**
-         * 支付（转账）
+         * 查询 订单 
          */
+        $data = $tradeRecord_model->getInfoTradeRecord(array('id' => $id, 'user_id' => $user_id));
+        if(empty($data)) {
+            Log::error('getInfo empty !');
+            EC::fail(EC_RED_EMP);
+        }
         
+        /**
+         * 增加 资金流水记录表
+         */
         
         /*
          * 修改 代付款订单 状态
@@ -149,10 +143,8 @@ class TradeRecordController extends BaseController {
         $res = $tradeRecord_model->updateTradeRecord($params,array('id' => $id,'user_id' => $user_id));
         if(false === $res){
             Log::error('updateTradeRecord faild !');
-            $tradeRecord_model->rollback(); // 事务回滚
             EC::fail(EC_UPD_REC);
         }
-        $tradeRecord_model->commit(); // 事务提交
     
         EC::success(EC_OK);
     }

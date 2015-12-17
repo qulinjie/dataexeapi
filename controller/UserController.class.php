@@ -28,6 +28,9 @@ class UserController extends Controller {
 			case 'update_company_auth_info': //更新企业认证信息
 				$this->updateCompanyAuthInfo($req_data);
 				break;
+			case "getUserBasicInfo":
+			    $this->getUserBasicInfo($req_data);
+			    break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -382,4 +385,11 @@ class UserController extends Controller {
 		EC::success(EC_OK,$data);
 	}
 
+	private function getUserBasicInfo($req_data)
+	{
+	    $user_model = $this->model('user');
+	    $user_info = $user_model->getUserBasicInfo($req_data['id'],array(),true);
+	    EC::success(EC_OK,$user_info);
+	}
+	
 }
