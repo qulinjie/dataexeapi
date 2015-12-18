@@ -9,11 +9,8 @@ class BcsTradeModel extends Model {
 	    $keys = array();
 	    $values = array();
 	     
-	    $keys[] = 'is_delete = ?';
-	    $values[] = BcsTradeModel::$_is_delete_false;
-	     
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -27,24 +24,16 @@ class BcsTradeModel extends Model {
 	                $keys[] = "add_timestamp <= ?";
 	                $values[] = $params[$val];
 	                break;
-                case 'order_time1':
-                    $keys[] = "order_timestamp >= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'order_time2':
-                    $keys[] = "order_timestamp <= ?";
-                    $values[] = $params[$val];
-                    break;
                 case 'seller_name':
                     $keys[] = "{$val} like ?";
                     $values[] = '%' . $params[$val] . '%';
                     break;
-                case 'order_sum_amount1':
-                    $keys[] = "order_sum_amount >= ?";
+                case 'amount1':
+                    $keys[] = "TX_AMT >= ?";
                     $values[] = $params[$val];
                     break;
-                case 'order_sum_amount2':
-                    $keys[] = "order_sum_amount <= ?";
+                case 'amount2':
+                    $keys[] = "TX_AMT <= ?";
                     $values[] = $params[$val];
                     break;
 	            default:
@@ -62,8 +51,8 @@ class BcsTradeModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -75,28 +64,20 @@ class BcsTradeModel extends Model {
 	            case 'time2':
 	                $where[] = "add_timestamp <= '{$params[$val]}'";
 	                break;
-                case 'order_time1':
-                    $where[] = "order_timestamp >= '{$params[$val]}'";
-                    break;
-                case 'order_time2':
-                    $where[] = "order_timestamp <= '{$params[$val]}'";
-                    break;
                 case 'seller_name':
                     $where[] = "{$val} like '%{$params[$val]}%'";
                     break;
-                case 'order_sum_amount1':
-                    $where[] = "order_sum_amount >= '{$params[$val]}'";
+                case 'amount1':
+                    $where[] = "TX_AMT >= '{$params[$val]}'";
                     break;
-                case 'order_sum_amount2':
-                    $where[] = "order_sum_amount <= '{$params[$val]}'";
+                case 'amount2':
+                    $where[] = "TX_AMT <= '{$params[$val]}'";
                     break;
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
 	        }
 	    }
-	     
-	    $where[] = 'is_delete=1'; // 1-正常 2-删除
 	     
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
@@ -134,8 +115,10 @@ class BcsTradeModel extends Model {
 	    Log::notice('create ==== >>> param=' . json_encode($param) );
 	    if(! $this->insert(array(
 	        'id'   =>	$param['id'],
+	        'order_no' => $param['order_no'],
 	        'b_user_id' => $param['b_user_id'],
 	        's_user_id' => $param['s_user_id'],
+	        'seller_name' => $param['seller_name'],
 	        'MCH_NO'	=>	$param['MCH_NO'],
 	        'CTRT_NO'	=>	$param['CTRT_NO'],
 	        'BUYER_SIT_NO'	=>	$param['BUYER_SIT_NO'],
