@@ -228,5 +228,17 @@ class UserModel extends Model {
 	public function updateCompanyAuth($status,$id){
 		return $this->update(array('company_authentication_status' => $status),array('id' => $id));
 	}
-	
+
+	public function isSetPayPassword($id){
+		return true == $this->where(array('id=?','pay_password!=""'),$id)->from(null,array('1'))->select();
+	}
+
+	public function updatePayPassword($id,$payPassword){
+		return $this->update(array('pay_password' => $payPassword),array('id'=>$id));
+	}
+
+	public function getPayPassword($id){
+		$pwd = $this->where('id=?',$id)->from(null,array('pay_password'))->select();
+		return $pwd ? $pwd[0]['pay_password'] : '';
+	}
 }

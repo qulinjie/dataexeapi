@@ -37,6 +37,15 @@ class UserController extends Controller {
 			case "getUserBasicInfo":
 			    $this->getUserBasicInfo($req_data);
 			    break;
+			case "isSetPayPassword":
+				$this->isSetPayPassword($req_data);
+				break;
+			case "setPayPassword":
+				$this->setPayPassword($req_data);
+				break;
+			case 'validatePayPassword':
+				$this->validatePayPassword($req_data);
+				break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -107,6 +116,7 @@ class UserController extends Controller {
 	    $session->set('auth_id', $session_data['auth_id']);
 	    $session->set('name', $session_data['name']);
 	    unset( $session_data['password'] );
+		unset( $session_data['pay_password'] );//支付密码一起删除
 	    $session->set('loginUser', $session_data);
 	}
 
@@ -464,5 +474,78 @@ class UserController extends Controller {
 	    $user_model = $this->model('user');
 	    $user_info = $user_model->getUserBasicInfo($req_data['id'],array(),true);
 	    EC::success(EC_OK,$user_info);
+	}
+
+	/**
+	 * true 设置，false 未设置
+	 * @param $req_data
+	 */
+	private function isSetPayPassword($req_data)
+	{
+		$session  = self::instance('session');
+		if(!$userInfo = $session->get('loginUser')){
+			EC::fail(EC_NOT_LOGIN);
+		}
+
+		EC::success(EC_OK,array('isSet' => $this->model('user')->isSetPayPassword($userInfo['id'])));
+	}
+
+	private function setPayPassword($req_data)
+	{
+		if(!isset($req_data['payPassword']) || !$req_data['payPassword']){
+			EC::fail(EC_PAR_BAD);
+		}
+
+		$session  = self::instance('session');
+		if(!$userInfo = $session->get('loginUser')){
+			EC::fail(EC_NOT_LOGIN);
+		}
+
+		$privateKey  = openssl_pkey_get_private(self::getConfig('conf')['private_key']);
+		$payPassword = base64_decode($req_data['payPassword']);
+		$decrypted_pwd = '';
+		openssl_private_decrypt($payPassword, $decrypted_pwd, $privateKey);
+
+		!$decrypted_pwd && EC::fail(EC_PWD_WRN);
+
+		$payPassword = password_hash($decrypted_pwd,PASSWORD_DEFAULT);
+		!$payPassword && EC::fail(EC_OTH);
+
+		if(!$this->model('user')->updatePayPassword($userInfo['id'],$payPassword)){
+			EC::fail(EC_UPD_REC);
+		}
+
+		EC::success(EC_OK);
+	}
+
+	private function validatePayPassword($req_data)
+	{
+		if(!isset($req_data['payPassword']) || !$req_data['payPassword']){
+			EC::fail(EC_PAR_BAD);
+		}
+
+		$session  = self::instance('session');
+		if(!$userInfo = $session->get('loginUser')){
+			EC::fail(EC_NOT_LOGIN);
+		}
+
+		$privateKey  = openssl_pkey_get_private(self::getConfig('conf')['private_key']);
+		$payPassword = base64_decode($req_data['payPassword']);
+		$decrypted_pwd = '';
+		openssl_private_decrypt($payPassword, $decrypted_pwd, $privateKey);
+
+		!$decrypted_pwd && EC::fail(EC_PWD_WRN);
+		Log::notice('PayPassword>>>>>'.$decrypted_pwd);
+
+		$encrypt_pwd = $this->model('user')->getPayPassword($userInfo['id']);
+		!$encrypt_pwd && EC::fail(EC_PAR_BAD); //未设置支付，不让通过;
+
+		if(password_verify($decrypted_pwd,$encrypt_pwd)){
+			Log::notice('validatePayPassword is success id '.$userInfo['id']);
+			EC::success(EC_OK);
+		}else{
+			Log::error('validatePayPassword is fail id '.$userInfo['id']);
+			EC::fail(EC_PWD_WRN);
+		}
 	}
 }
