@@ -440,6 +440,7 @@ class UserController extends Controller {
 			EC::fail(EC_PWD_UPD);
 		}
 
+		MessageController::addMsg($loginUser['id'],200);
 		EC::success(EC_OK);
 	}
 
@@ -495,9 +496,9 @@ class UserController extends Controller {
 		if(!isset($req_data['payPassword']) || !$req_data['payPassword']){
 			EC::fail(EC_PAR_BAD);
 		}
-
 		$session  = self::instance('session');
 		if(!$userInfo = $session->get('loginUser')){
+			Log::error('set PayPassword not login');
 			EC::fail(EC_NOT_LOGIN);
 		}
 
@@ -505,16 +506,23 @@ class UserController extends Controller {
 		$payPassword = base64_decode($req_data['payPassword']);
 		$decrypted_pwd = '';
 		openssl_private_decrypt($payPassword, $decrypted_pwd, $privateKey);
-
-		!$decrypted_pwd && EC::fail(EC_PWD_WRN);
+		if(!$decrypted_pwd){
+			Log::error('setPayPassword password is empty');
+			EC::fail(EC_PWD_EMP);
+		}
 
 		$payPassword = password_hash($decrypted_pwd,PASSWORD_DEFAULT);
-		!$payPassword && EC::fail(EC_OTH);
+		if(!$payPassword){
+			Log::error('setPayPassword encrypt password is error');
+			EC::fail(EC_OTH);
+		}
 
 		if(!$this->model('user')->updatePayPassword($userInfo['id'],$payPassword)){
+			Log::error('setPayPassword is fail msg('.$this->model('user')->getErrorInfo().')');
 			EC::fail(EC_UPD_REC);
 		}
 
+		MessageController::addMsg($userInfo['id'],300);
 		EC::success(EC_OK);
 	}
 

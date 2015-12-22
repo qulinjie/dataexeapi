@@ -41,6 +41,13 @@ class IdModel extends Model{
 	    $this->execute($sql);
 	    return (self::$_bcs_trade_id_offset + $this->db->insertId());
 	}
+
+	//默认从1开始
+	public function getMessageId(){
+		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_message'";
+		$this->execute($sql);
+		return $this->db->insertId();
+	}
 	
 	public function getBcsTransferId(){
 	    $sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_bcs_transfer'";
