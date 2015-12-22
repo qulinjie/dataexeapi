@@ -94,7 +94,7 @@ class BcsChildAccountController extends BaseController {
     
     public function delete($req_data){
         $bcsChildAccount_model = $this->model('bcsChildAccount');
-        $res = $bcsChildAccount_model->deleteChildAccount($req_data);
+        $res = $bcsChildAccount_model->deleteBcsChildAccount($req_data);
         if(false === $res){
             Log::error('delete faild !');
             EC::fail(EC_DEL_FAI);
