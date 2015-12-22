@@ -7,6 +7,7 @@ class IdModel extends Model{
 	protected static $_trade_record_id_offset = 100;
 	protected static $_bcs_trade_id_offset = 100;
 	protected static $_bcs_transfer_id_offset = 100;
+	protected static $_bcs_child_account_id_offset = 100;
 	
 	public function tableName(){
 		return 'c_id';
@@ -53,6 +54,12 @@ class IdModel extends Model{
 	    $sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_bcs_transfer'";
 	    $this->execute($sql);
 	    return (self::$_bcs_transfer_id_offset + $this->db->insertId());
+	}
+	
+	public function getBcsChildAccountId(){
+	    $sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_bcs_child_account'";
+	    $this->execute($sql);
+	    return (self::$_bcs_child_account_id_offset + $this->db->insertId());
 	}
 	
 }
