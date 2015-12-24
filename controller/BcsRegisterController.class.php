@@ -54,12 +54,9 @@ class BcsRegisterController extends BaseController {
     }
     
     public function update($req_data){
-        $user_id = $req_data['user_id'];
-        unset($req_data['user_id']);
-    
-        $bcsRegister_model = $this->model('bcsRegister');
-        $res = $bcsRegister_model->updateBcsRegister($req_data,array('user_id' => $user_id));
-        if(false === $res){
+        $param = array('ACCOUNT_NO' => $req_data['ACCOUNT_NO'],'ACT_TIME' =>$req_data['ACT_TIME']);
+        $where = array('MCH_NO'     => $req_data['MCH_NO']    ,'SIT_NO' => $req_data['SIT_NO']);
+        if(!$this->model('bcsRegister')->updateBcsRegister($param,$where)){
             Log::error('updateBcsRegister faild !');
             EC::fail(EC_UPD_REC);
         }
