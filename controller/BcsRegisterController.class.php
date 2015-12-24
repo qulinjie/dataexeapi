@@ -73,37 +73,26 @@ class BcsRegisterController extends BaseController {
     }
     
     public function create($req_data){
-        $id = $this->model('id')->getBcsRegisterId();
-        $req_data['id'] = $id;
-        
-        $bcsRegister_model = $this->model('bcsRegister');
-        $bcsRegister_model->startTrans(); // 事务开始
-
-        /*
-         * 修改授权码 ，已使用次数 +1
-         */
-        $code_model = $this->model('authorizationCode');
-        $params = array();
-        $params['used_count'] = ((int)$req_data['code_used_count']) + 1;
-        $res = $code_model->updateAuthCode($params,array('id' => $req_data['code_id']));
-        if(false === $res){
-            Log::error('updateAuthCode faild ! rollback .');
-            $bcsRegister_model->rollback(); // 事务回滚
-            EC::fail(EC_UPD_REC);
+        $session = self::instance('session');
+        if(!$loginUser = $session->get('loginUser')){
+            Log::error('create not login');
+            EC::fail(EC_NOT_LOGIN);
         }
-        
-        /*
-         * 增加 代付款订单  
-         */
-        $data = $bcsRegister_model->createBcsRegister($req_data);
-        if(false === $data){
+
+        if($this->model('bcsRegister')->checkIsExist($loginUser['id'],$req_data['CUST_SPE_ACCT_NO'])){
+            Log::error('bank card already exists');
+            EC::fail(EC_REC_EST);
+        }
+
+        $req_data['id']         = $this->model('id')->getBcsRegisterId();
+        $req_data['user_id']    = $loginUser['id'];
+        $req_data['ACCOUNT_NO'] = '';
+
+        if(!$this->model('bcsRegister')->createBcsRegister($req_data)){
             Log::error('createBcsRegister Fail! rollback .');
-            $bcsRegister_model->rollback(); // 事务回滚
             EC::fail(EC_ADD_REC);
         }
-        $bcsRegister_model->commit(); // 事务提交
-        
-        EC::success(EC_OK,$id);
+        EC::success(EC_OK);
     }
     
 }
