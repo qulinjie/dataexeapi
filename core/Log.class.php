@@ -27,6 +27,17 @@ class Log extends Base {
 	public static function warning($message){
 		Log::write($message, 'Warning');
 	}
+
+    //bank log 定义三种级别
+    public static function bcsError($message){
+        Log::write($message,'Error','bcs-'.date('Y-m-d'));
+    }
+    public static function bcsNotice($message){
+        Log::write($message, 'Notice','bcs-'.date('Y-m-d'));
+    }
+    public static function bcsWarning($message){
+        Log::write($message, 'Warning','bcs-'.date('Y-m-d'));
+    }
     /**
      * 写入日志
      *

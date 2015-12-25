@@ -9,7 +9,6 @@
 
 class CSBankSoap
 {
-	protected $innerWebWsdlUrl = 'http://162.16.1.137:43294/icop/services/JTService?wsdl';
 
 	protected static $client;
 
@@ -20,11 +19,16 @@ class CSBankSoap
 	 */
 	protected function sendQuery( $ServiceCode, $requestParms, $fetchAll=false )
 	{
+	    Log::bcsNotice( 'CSBankSoap===============>>sendQuery-str requestParms=##' . var_export( $requestParms, true ) . "##");
 		$SendString = $this->getSendString( $ServiceCode, $requestParms );
 		$client = $this-> getSoapClient();
-		//file_put_contents('1.txt', $SendString);
+		if( !$client ) {
+		    Log::bcsError("getSoapClient failed ." );
+		    return false;
+		}
+		Log::bcsNotice( 'CSBankSoap===============>>sendQuery request=##' . var_export( $SendString, true ) . "##");
 		$resXMLString = $client->__soapCall( 'request', $SendString );
-		//file_put_contents('2.txt', $resXMLString);
+		Log::bcsNotice( 'CSBankSoap===============>>sendQuery response=##' . var_export( $resXMLString, true ) . "##");
 		return $this->fetchArrayResult( $resXMLString, $fetchAll );
 	}
 
@@ -77,8 +81,17 @@ class CSBankSoap
 	private function getSoapClient()
 	{
 		if ( !self::$client ) {
-			$soapApiUrl = 'http://162.16.1.137:43294/icop/services/JTService?wsdl';
-			self::$client = new SoapClient( $soapApiUrl );
+			$config = Controller::getConfig('conf');
+			if( !$config['CSBankSoapUrl'] ) {
+				Log::bcsError('conf/conf.ini.php  not  have "CSBankSoapUrl" ');
+				return false;
+			}
+			try {
+				self::$client = new SoapClient( $config['CSBankSoapUrl'] );
+			} catch ( Exception $e ) {
+				Log::bcsError( 'SOAP-ERROR: '. var_export( $e->getMessage(), true ) );
+				return false;
+			}
 		}
 		return self::$client;
 	}
@@ -92,29 +105,29 @@ class CSBankSoap
 	 * @param: 0 $Encrypt 请求类型 0：正常 1：测试 2：重发
 	 * @return:  
 	 */
-	private function constructHeader( $ServiceCode, $bodyXmlString, $RequestType='0', $Encrypt='1' )
+	private function constructHeader( $ServiceCode, $bodyXmlString, $RequestType='0', $Encrypt='0' )
 	{
 		$header = [];
-		$header['ProductId'] = '';
+// 		$header['ProductId'] = '';
 		$header['ServiceCode'] = $ServiceCode;			// 服务编码
 		$header['ChannelId'] = '607';					// 渠道号
 		$header['ExternalReference'] = $this->getExternalReference(); // 渠道流水号
-		$header['OriginalChannelId'] = '002';						  // 原渠道号  -- 目前照例子填的
-		$header['OriginalReference'] = '201408210006485';	// 原渠道流水号 -- 目前也是乱填
+// 		$header['OriginalChannelId'] = '002';						  // 原渠道号  -- 目前照例子填的
+// 		$header['OriginalReference'] = '201408210006485';	// 原渠道流水号 -- 目前也是乱填
 		$header['RequestTime'] = date('YmdHis');			// 请求时间
 		$header['TradeDate'] = substr( $header['RequestTime'], 0, 8 );  // 交易日期
 		$header['Version'] = '1.0';										// 报文头版本  -- 照着例子写的
-		$header['RequestBranchCode'] = 'CN0010001';		// 请求机构代号 -- 照例
-		$header['RequestOperatorId'] = 'FB.ICOP.X01';	// 请求柜员代号
-		$header['RequestOperatorType'] = '0';			// 请求柜员类型 0-实柜员 1-虚柜员
-		$header['BankNoteBoxID'] = '';		// 柜员或是机具的钱箱号
-		$header['AuthorizerID'] = '';		// 授权柜员号
+// 		$header['RequestBranchCode'] = 'CN0010001';		// 请求机构代号 -- 照例
+// 		$header['RequestOperatorId'] = 'FB.ICOP.X01';	// 请求柜员代号
+// 		$header['RequestOperatorType'] = '0';			// 请求柜员类型 0-实柜员 1-虚柜员
+// 		$header['BankNoteBoxID'] = '';		// 柜员或是机具的钱箱号
+// 		$header['AuthorizerID'] = '';		// 授权柜员号
 		$header['TermType'] = '00000';		// 终端类型
 		$header['TermNo'] = '0000000000';	// 终端号
 		$header['RequestType'] = $RequestType; // 请求类型 0：正常 1：测试 2：重发
 		$header['Encrypt'] = $Encrypt;		// 加密标志 0:明文 1:密文
 		$header['SignData'] = $this->CreateSignData( $bodyXmlString ); // 签名数据
-		var_dump($header['SignData']);
+// 		var_dump($header['SignData']);
 		return  $this->arrayToXml( ['Header'=>$header] );
 	}
 
