@@ -76,10 +76,10 @@ class BcsRegisterController extends BaseController {
             EC::fail(EC_NOT_LOGIN);
         }
 
-        if($this->model('bcsRegister')->checkIsExist($loginUser['id'],$req_data['CUST_SPE_ACCT_NO'])){
-            Log::error('bank card already exists');
-            EC::fail(EC_REC_EST);
-        }
+//         if($this->model('bcsRegister')->checkIsExist($loginUser['id'],$req_data['CUST_SPE_ACCT_NO'])){
+//             Log::error('bank card already exists');
+//             EC::fail(EC_REC_EST);
+//         }
 
         $req_data['id']         = $this->model('id')->getBcsRegisterId();
         $req_data['user_id']    = $loginUser['id'];
