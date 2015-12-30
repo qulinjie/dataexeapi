@@ -56,6 +56,12 @@ class TradeRecordModel extends Model {
                     $keys[] = "order_sum_amount <= ?";
                     $values[] = $params[$val];
                     break;
+                case 'order_status':
+                    if('9' == $params[$val]){
+                        $keys[] = 'order_status in ( ' . TradeRecordModel::$_status_paid . ',' . TradeRecordModel::$_status_refuse . ' ) and \'1\'=? ';
+                        $values[] = '1';
+                        break;
+                    }
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
@@ -99,6 +105,11 @@ class TradeRecordModel extends Model {
                 case 'order_sum_amount2':
                     $where[] = "order_sum_amount <= '{$params[$val]}'";
                     break;
+                case 'order_status':
+                    if('9' == $params[$val]){
+                        $where[] = 'order_status in ( ' . TradeRecordModel::$_status_paid . ',' . TradeRecordModel::$_status_refuse . ' ) ';
+                        break;
+                    }
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
