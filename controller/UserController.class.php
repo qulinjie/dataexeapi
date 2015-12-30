@@ -130,43 +130,37 @@ class UserController extends Controller {
 	    //解密密码
 	    openssl_private_decrypt($pwd, $decrypted_pwd, $pi_key);
 	    Log::notice('--------------decrypted_pwd---buildPassword-----params==>>' . var_export($decrypted_pwd, true) . ' ,id=' . $id . ' ,MD5_pwd=' . md5($id . $decrypted_pwd));
-	    return md5($id . $decrypted_pwd);
+	    return $decrypted_pwd ? md5($id . $decrypted_pwd) : false; //为false  表示解密失败
 	}
 
 	private function register($req_data){
-	    $tel = $req_data['tel'];
-	    $pwd = $req_data['pwd'];
-	    $code = $req_data['code'];
-
-	    if(!$tel || !$pwd || !$code){
-	        Log::error('request param error!');
-	        EC::fail(EC_PAR_BAD);
-	    }
-
 	    //检查验证码
-	    $checkCmsCodeRes = $this->checkCmsCode($tel,$code);
+	    $checkCmsCodeRes = $this->checkCmsCode($req_data['tel'],$req_data['code']);
 		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
 
 	    //判断用户是否已存在(没注册过或者未被删除)
 	    $user_model = $this->model('user');
-	    $user_data = $user_model->getUserInfoByTel($tel,array(),true);
+	    $user_data = $user_model->getUserInfoByTel($req_data['tel'],array(),true);
 	    if(!empty($user_data) && $user_data['status'] == '1'){
-	        Log::error('user exist:' . $tel);
+	        Log::error('user exist:' . $req_data['tel']);
 	        EC::fail(EC_USR_EST);
 	    }else if(!empty($user_data) && $user_data['enabled_status'] == '2'){
-	        Log::error('user disable:' . $tel);
+	        Log::error('user disable:' . $req_data['tel']);
 	        EC::fail(EC_USE_UNA);
 	    }
 
 	    $user_id = $this->model('id')->getUserId();
 		$certification_id = $this->model('id')->getCertificationId();
 	    //密码md5加密
-	    $md5_pwd = UserController::buildPassword($user_id, $pwd);
+	    if(!$md5_pwd = UserController::buildPassword($user_id, $req_data['pwd'])){
+			Log::error('password decrypt error');
+			EC::fail(EC_PWD_DEC);
+		}
 
 	    //注册用户写入数据库
 		try{
 			$user_model->startTrans();
-			if(!$user_model->createUser(array('id'=>$user_id,'tel'=>$tel,'name'=>'','password'=>$md5_pwd))
+			if(!$user_model->createUser(array('id'=>$user_id,'tel'=>$req_data['tel'],'name'=>'','password'=>$md5_pwd))
 			   ||!$this->model('certification')->add($certification_id,$user_id)){
 				throw new Exception(); //错误信息，底层sql有写文件
 			}
@@ -179,7 +173,7 @@ class UserController extends Controller {
 			EC::fail(EC_USR_ADD);
 		}
 
-	    EC::success(EC_OK,array('certification_id' => $certification_id));
+	    EC::success(EC_OK,array('register_certification_id' => $certification_id));
 	}
 
 	/**

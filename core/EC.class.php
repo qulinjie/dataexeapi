@@ -51,6 +51,7 @@ define('EC_PAR_ERR', 203);
 define('EC_REC_EST', 204);
 define('EC_ADD_REC', 205);
 define('EC_UPD_REC', 206);
+define('EC_LOGIN_PAR_REC', 207);
 
 define('EC_CODE_ERR', 301);
 
@@ -109,7 +110,7 @@ class EC extends Base {
     	    EC_UPD_REC		=>	'修改记录错误',
     	     
     	    EC_CODE_ERR      =>  '授权码验证失败',
-	    
+			EC_LOGIN_PAR_REC	=>	'用户名或密码错误',
 	);
 	public static function load(){
 		return true;
