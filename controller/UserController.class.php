@@ -46,6 +46,9 @@ class UserController extends Controller {
 			case 'validatePayPassword':
 				$this->validatePayPassword($req_data);
 				break;
+			case "getUserInfo":
+			    $this->getUserInfo($req_data);
+			    break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -471,6 +474,12 @@ class UserController extends Controller {
 	    EC::success(EC_OK,$user_info);
 	}
 
+	public function getUserInfo($req_data){
+	    $code_model = $this->model('user');
+	    $data = $code_model->getUserInfo($req_data, array());
+	    EC::success(EC_OK,$data);
+	}
+	
 	/**
 	 * true 设置，false 未设置
 	 * @param $req_data
