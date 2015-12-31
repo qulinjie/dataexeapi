@@ -138,7 +138,7 @@ class UserController extends Controller {
 
 	private function register($req_data){
 	    //检查验证码
-	    $checkCmsCodeRes = $this->checkCmsCode($req_data['tel'],$req_data['code']);
+	    $checkCmsCodeRes = self::checkCmsCode($req_data['tel'],$req_data['code']);
 		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
 
 	    //判断用户是否已存在(没注册过或者未被删除)
@@ -315,8 +315,8 @@ class UserController extends Controller {
 	 * @param $code
 	 * @return int
 	 */
-	private function checkCmsCode($tel,$code){
-		$verify_model = $this->model('verify');
+	public static function checkCmsCode($tel,$code){
+		$verify_model = self::model('verify');
 		$verify_data  = $verify_model->getVerifyRecordByTel($tel,$code);
 
 		//是否验证通过
@@ -443,6 +443,7 @@ class UserController extends Controller {
 
 	private function findPassword($req_data)
 	{
+		$params = [];
 		$keys = ['account','name','tel','code','auth_filename','auth_filepath',];
 		foreach($keys as $key => $val){
 			if(!isset($req_data[$val])||!$req_data[$val]){
@@ -453,7 +454,7 @@ class UserController extends Controller {
 
 
 		//检查验证码
-		$checkCmsCodeRes = $this->checkCmsCode($params['tel'],$params['code']);
+		$checkCmsCodeRes = self::checkCmsCode($params['tel'],$params['code']);
 		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
 
 		$params['status']       = 1;

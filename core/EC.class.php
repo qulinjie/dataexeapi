@@ -44,6 +44,7 @@ define('EC_UPD_FAI', 120);
 define('EC_ADD_FAI', 121);
 define('EC_VER_NCH', 122);
 define('EC_SIG_ARD', 123);
+define('EC_CERT_ERR',124);
 
 define('EC_RED_EXP', 201);
 define('EC_RED_EMP', 202);
@@ -52,6 +53,8 @@ define('EC_REC_EST', 204);
 define('EC_ADD_REC', 205);
 define('EC_UPD_REC', 206);
 define('EC_LOGIN_PAR_REC', 207);
+
+define('EC_USE_UNA', 220);
 
 define('EC_CODE_ERR', 301);
 
@@ -88,7 +91,7 @@ class EC extends Base {
 			EC_PWD_DEC		=>	'decode password fail',
 			EC_ARD_LGN		=>	'a user login already, please logout before login another user',
 			EC_USR_ADD		=>	'add user information fail',
-			EC_USR_NON		=>	'user not exists',
+			EC_USR_NON		=>	'用户不存在',
 			EC_PWD_WRN		=>	'wrong password',
 			EC_PWD_EMP		=>	'password is empty',
 			EC_PWD_SAM		=>	'same password',
@@ -110,7 +113,9 @@ class EC extends Base {
     	    EC_UPD_REC		=>	'修改记录错误',
     	     
     	    EC_CODE_ERR      =>  '授权码验证失败',
-			EC_LOGIN_PAR_REC	=>	'用户名或密码错误',
+			EC_LOGIN_PAR_REC =>	'用户名或密码错误',
+			EC_USE_UNA		 =>	'用户被禁用',
+			EC_CERT_ERR      => '证书验证失败',
 	);
 	public static function load(){
 		return true;
