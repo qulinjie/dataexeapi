@@ -4,7 +4,7 @@ class UserController extends Controller {
 
     public function handle($params = array(), $req_data = array()) {
         switch ($params[0]) {
-            case "send_sms_code":
+            case "sendSmsCode":
                 $this->sendSmsCode($req_data);
                 break;
             case "register":
@@ -13,39 +13,27 @@ class UserController extends Controller {
             case "login":
                 $this->login($req_data);
                 break;
-			case "is_login":
+			case "isLogin":
 				$this->isLogin($req_data);
 				break;
-			case "get_login_user":
+			case "getLoginUser":
 				$this->getLoginUser($req_data);
 				break;
-            case "login_out":
-                $this->loginOut($req_data);
+            case "loginOut":
+                $this->loginOut();
                 break;
-			case 'update_personal_auth_info': //更新个人认证信息
+			case 'updatePersonalAuthInfo': //更新个人认证信息
 				$this->updatePersonalAuthInfo($req_data);
 				break;
-			case 'update_company_auth_info': //更新企业认证信息
+			case 'updateCompanyAuthInfo': //更新企业认证信息
 				$this->updateCompanyAuthInfo($req_data);
 				break;
-			case 'set_password': //设置密码
-				$this->setPassword($req_data);
-				break;
-			case 'find_password': //找回密码
-				$this->findPassword($req_data);
+			case 'loginPasswordReset': //登录密码重置
+				$this->loginPasswordReset($req_data);
 				break;
 			case "getUserBasicInfo":
 			    $this->getUserBasicInfo($req_data);
 			    break;
-			case "isSetPayPassword":
-				$this->isSetPayPassword($req_data);
-				break;
-			case "setPayPassword":
-				$this->setPayPassword($req_data);
-				break;
-			case 'validatePayPassword':
-				$this->validatePayPassword($req_data);
-				break;
 			case "getUserInfo":
 			    $this->getUserInfo($req_data);
 			    break;
@@ -57,16 +45,8 @@ class UserController extends Controller {
 	}
 
 	private function login($req_data){
-	    $tel = $req_data['tel'];
-	    $pwd = $req_data['pwd'];
-
-	    if( !$tel || ! $pwd){
-	        Log::error('login . params err .');
-	        EC::fail(EC_PAR_BAD);
-	    }
-
 	    $user_model = $this->model('user');
-	    $user_info = $user_model->getUserInfoByTel($tel,array(),true);
+	    $user_info = $user_model->getUserInfoByTel($req_data['tel'],array(),true);
 
 	    if(empty($user_info) ) {
 	        Log::error('login . user not exsit . ');//用户不存在
@@ -75,7 +55,7 @@ class UserController extends Controller {
 			Log::error('login . user disable! id=' . $user_info['id']);
 			EC::fail(EC_USE_UNA);
 		}
-	    if(UserController::buildPassword($user_info['id'], $pwd) != $user_info['password']){
+	    if(UserController::buildPassword($user_info['id'], $req_data['pwd']) != $user_info['password']){
 	        Log::error('login . pwd error');//密码错误
 	        EC::fail(EC_LOGIN_PAR_REC);
 	    }
@@ -185,11 +165,6 @@ class UserController extends Controller {
 	 */
 	private function sendSmsCode($req_data){
 	    $tel = $req_data['tel'];
-	    if(!$tel){
-	        Log::error("sendSmsCode tel is empyt . ");
-	        EC::fail(EC_PAR_BAD);
-	    }
-
 	    // 1-注册 2-找回密码
 	    $type = $req_data['type'] ? $req_data['type'] : 1;
 
@@ -244,13 +219,7 @@ class UserController extends Controller {
 	 * @param unknown $type
 	 */
 	public function sendCode($phonenum,$code,$type){
-	    if(!$phonenum || !$code){
-	        Log::error('phonenum or code is empty . phonenum=' . $phonenum . ',code=' . $code);
-	        return false;
-	    }
-
 	    $sms = $this->instance('sms');
-
 	    //获取配置信息
 	    $conf = $this->getConfig('conf');
 	    /*配置参数*/
@@ -409,14 +378,8 @@ class UserController extends Controller {
 		EC::success(EC_OK,$data);
 	}
 
-
-	private function setPassword($req_data)
+	private function loginPasswordReset($req_data)
 	{
-		if(!$req_data['oldPwd'] || !$req_data['newPwd']){
-			Log::error('setPassword input parameter error');
-			EC::fail(EC_PAR_BAD);
-		}
-
 		$session = self::instance('session');
 		if(!$loginUser = $session->get('loginUser')){
 			Log::error('setPassword not Login');
@@ -441,33 +404,6 @@ class UserController extends Controller {
 		EC::success(EC_OK);
 	}
 
-	private function findPassword($req_data)
-	{
-		$params = [];
-		$keys = ['account','name','tel','code','auth_filename','auth_filepath',];
-		foreach($keys as $key => $val){
-			if(!isset($req_data[$val])||!$req_data[$val]){
-				EC::fail(EC_PAR_BAD);
-			}
-			$params [$val] = $req_data[$val];
-		}
-
-
-		//检查验证码
-		$checkCmsCodeRes = self::checkCmsCode($params['tel'],$params['code']);
-		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
-
-		$params['status']       = 1;
-		$params['add_timestamp']= date('Y-m-d H:i:s');
-
-		if(!$this->model('findPassword')->add($params)){
-			Log::error('add findPassword is fail msg('.$this->model('findPassword')->getErrorInfo().')');
-			EC::fail(EC_ADD_FAI);
-		}
-
-		EC::success(EC_OK);
-	}
-
 	private function getUserBasicInfo($req_data)
 	{
 	    $user_model = $this->model('user');
@@ -479,85 +415,5 @@ class UserController extends Controller {
 	    $code_model = $this->model('user');
 	    $data = $code_model->getUserInfo($req_data, array());
 	    EC::success(EC_OK,$data);
-	}
-	
-	/**
-	 * true 设置，false 未设置
-	 * @param $req_data
-	 */
-	private function isSetPayPassword($req_data)
-	{
-		$session  = self::instance('session');
-		if(!$userInfo = $session->get('loginUser')){
-			EC::fail(EC_NOT_LOGIN);
-		}
-
-		EC::success(EC_OK,array('isSet' => $this->model('user')->isSetPayPassword($userInfo['id'])));
-	}
-
-	private function setPayPassword($req_data)
-	{
-		if(!isset($req_data['payPassword']) || !$req_data['payPassword']){
-			EC::fail(EC_PAR_BAD);
-		}
-		$session  = self::instance('session');
-		if(!$userInfo = $session->get('loginUser')){
-			Log::error('set PayPassword not login');
-			EC::fail(EC_NOT_LOGIN);
-		}
-
-		$privateKey  = openssl_pkey_get_private(self::getConfig('conf')['private_key']);
-		$payPassword = base64_decode($req_data['payPassword']);
-		$decrypted_pwd = '';
-		openssl_private_decrypt($payPassword, $decrypted_pwd, $privateKey);
-		if(!$decrypted_pwd){
-			Log::error('setPayPassword password is empty');
-			EC::fail(EC_PWD_EMP);
-		}
-
-		$payPassword = password_hash($decrypted_pwd,PASSWORD_DEFAULT);
-		if(!$payPassword){
-			Log::error('setPayPassword encrypt password is error');
-			EC::fail(EC_OTH);
-		}
-
-		if(!$this->model('user')->updatePayPassword($userInfo['id'],$payPassword)){
-			Log::error('setPayPassword is fail msg('.$this->model('user')->getErrorInfo().')');
-			EC::fail(EC_UPD_REC);
-		}
-
-		MessageController::addMsg($userInfo['id'],300);
-		EC::success(EC_OK);
-	}
-
-	private function validatePayPassword($req_data)
-	{
-		if(!isset($req_data['payPassword']) || !$req_data['payPassword']){
-			EC::fail(EC_PAR_BAD);
-		}
-
-		$session  = self::instance('session');
-		if(!$userInfo = $session->get('loginUser')){
-			EC::fail(EC_NOT_LOGIN);
-		}
-
-		$privateKey  = openssl_pkey_get_private(self::getConfig('conf')['private_key']);
-		$payPassword = base64_decode($req_data['payPassword']);
-		$decrypted_pwd = '';
-		openssl_private_decrypt($payPassword, $decrypted_pwd, $privateKey);
-
-		!$decrypted_pwd && EC::fail(EC_PWD_WRN);
-		Log::notice('PayPassword>>>>>'.$decrypted_pwd);
-
-		$encrypt_pwd = $this->model('user')->getPayPassword($userInfo['id']);
-		!$encrypt_pwd && EC::fail(EC_PAR_BAD); //未设置支付，不让通过;
-
-		if(password_verify($decrypted_pwd,$encrypt_pwd)){
-			Log::notice('validatePayPassword is success id '.$userInfo['id']);
-			EC::success(EC_OK);
-		}else{
-			Log::error('validatePayPassword is fail id '.$userInfo['id']);
-			EC::fail(EC_PWD_WRN);
-		}
 	}
 }

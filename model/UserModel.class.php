@@ -229,7 +229,7 @@ class UserModel extends Model {
 		return $this->update(array('company_authentication_status' => $status),array('id' => $id));
 	}
 
-	public function isSetPayPassword($id){
+	public function checkPayPassword($id){
 		return true == $this->where(array('id=?','pay_password!=""'),$id)->from(null,array('1'))->select();
 	}
 
