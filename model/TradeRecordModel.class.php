@@ -17,12 +17,16 @@ class TradeRecordModel extends Model {
 	public function getSearchCnt($params = array()){
 	    $keys = array();
 	    $values = array();
+	    
+	    if(empty($params['is_delete']) ){
+    	    $keys[] = 'is_delete = ?';
+    	    $values[] = TradeRecordModel::$_is_delete_false;
+	    }
 	     
-	    $keys[] = 'is_delete = ?';
-	    $values[] = TradeRecordModel::$_is_delete_false;
-	     
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete',
+	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
+	        'order_id'
+	    ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -77,8 +81,10 @@ class TradeRecordModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete',
+	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
+	        'order_id'
+	    ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -115,9 +121,11 @@ class TradeRecordModel extends Model {
 	                break;
 	        }
 	    }
-	     
-	    $where[] = 'is_delete=1'; // 1-正常 2-删除
-	     
+	    
+	    if(empty($params['is_delete']) ){
+	       $where[] = 'is_delete=1'; // 1-正常 2-删除
+	    }
+	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	     

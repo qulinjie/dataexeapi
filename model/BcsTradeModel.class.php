@@ -5,6 +5,11 @@ class BcsTradeModel extends Model {
 		return 'c_bcs_trade';
 	}
 	
+	// 交易状态 1-成功 2-失败 3-未知
+	public static $_status_success = 1;
+	public static $_status_failed = 2;
+	public static $_status_unknown = 3;
+	
 	public function getSearchCnt($params = array()){
 	    $keys = array();
 	    $values = array();
@@ -73,6 +78,12 @@ class BcsTradeModel extends Model {
                 case 'amount2':
                     $where[] = "TX_AMT <= '{$params[$val]}'";
                     break;
+                case 'status':
+                    if('31' == $params[$val]){
+                        $keys[] = 'status in ( ' .BcsTradeModel::$_status_unknown . ',' . BcsTradeModel::$_status_success . ' ) and \'1\'=? ';
+                        $values[] = '1';
+                        break;
+                    }
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;

@@ -82,6 +82,7 @@ class BcsTradeController extends BaseController {
         
         $params = $req_data['bcs_trade'];
         $params['id'] = $id;
+        $params['order_id'] = $req_data['order_id'];
         $params['order_no'] = $req_data['order_no'];
         $params['b_user_id'] = $req_data['b_user_id'];
         $params['s_user_id'] = $req_data['s_user_id'];
