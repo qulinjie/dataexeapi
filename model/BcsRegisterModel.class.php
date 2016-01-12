@@ -141,5 +141,10 @@ class BcsRegisterModel extends Model {
 	public function checkIsExist($user_id,$card){
 		return true == $this->where(array('user_id=?','CUST_SPE_ACCT_NO=?'),array($user_id,$card))->from(null,'id')->select();
 	}
-	
+
+
+	public function getSitNo($user_id = -1){
+		$data = $this->where('user_id=?',$user_id)->from(null,['SIT_NO'])->select();
+		return $data ? $data[0]['SIT_NO'] : false;
+	}
 }

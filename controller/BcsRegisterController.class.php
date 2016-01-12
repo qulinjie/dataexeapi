@@ -26,6 +26,9 @@ class BcsRegisterController extends BaseController {
                 case 'create':
                     $this->create($req_data);
                     break;
+                case 'getSitNo':
+                    $this->getSitNo($req_data);
+                    break;
                 default:
                     Log::error('method not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -91,5 +94,16 @@ class BcsRegisterController extends BaseController {
         }
         EC::success(EC_OK);
     }
-    
+
+    private function getSitNo($req_data)
+    {
+        $session = $this->instance('session');
+        if(!$loginUser= $session->get('loginUser')) {
+            Log::bcsError('not Login');
+            EC::fail(EC_NOT_LOGIN);
+        }
+
+        $data = $this->model('bcsRegister')->getSitNo($loginUser['id']);
+        $data ? EC::success(EC_OK,['SIT_NO' => $data ]) : EC::fail(EC_SIT_NO_NON);
+    }
 }

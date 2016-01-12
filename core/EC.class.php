@@ -57,7 +57,7 @@ define('EC_LOGIN_PAR_REC', 207);
 define('EC_USE_UNA', 220);
 
 define('EC_CODE_ERR', 301);
-
+define('EC_SIT_NO_NON',601);
 class EC extends Base {
 
 	public static $_errMsg = array(
@@ -116,6 +116,7 @@ class EC extends Base {
 			EC_LOGIN_PAR_REC =>	'用户名或密码错误',
 			EC_USE_UNA		 =>	'用户被禁用',
 			EC_CERT_ERR      => '证书验证失败',
+			EC_SIT_NO_NON     => '席位号不存在',
 	);
 	public static function load(){
 		return true;
