@@ -37,6 +37,15 @@ class UserController extends Controller {
 			case "getUserInfo":
 			    $this->getUserInfo($req_data);
 			    break;
+			case 'isAdmin':
+				$this->isAdmin($req_data);
+				break;
+			case 'getCnt':
+				$this->getCnt($req_data);
+				break;
+			case 'getList':
+				$this->getList($req_data);
+				break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -415,5 +424,26 @@ class UserController extends Controller {
 	    $code_model = $this->model('user');
 	    $data = $code_model->getUserInfo($req_data, array());
 	    EC::success(EC_OK,$data);
+	}
+
+	private function isAdmin($req_data)
+	{
+		$session = self::instance('session');
+		if(!$loginUser = $session->get('loginUser')){
+			Log::error('setPassword not Login');
+			EC::fail(EC_NOT_LOGIN);
+		}
+
+		EC::success(EC_OK,['status' => $loginUser['account'] == 'admin']);
+	}
+
+	private function getCnt($req_data)
+	{
+		EC::success(EC_OK,$this->model('user')->getCnt());
+	}
+
+	private function getList($req_data)
+	{
+
 	}
 }

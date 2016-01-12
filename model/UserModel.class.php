@@ -241,4 +241,14 @@ class UserModel extends Model {
 		$pwd = $this->where('id=?',$id)->from(null,array('pay_password'))->select();
 		return $pwd ? $pwd[0]['pay_password'] : '';
 	}
+
+	public function getList($params = array(),$page = 1,$count = 100,$field = array('id',''))
+	{
+
+	}
+
+	public function getCnt($params = null)
+	{
+		return $this->count(null,'id',$params);
+	}
 }
