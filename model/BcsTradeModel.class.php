@@ -15,7 +15,7 @@ class BcsTradeModel extends Model {
 	    $values = array();
 	     
 	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id' ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -54,10 +54,12 @@ class BcsTradeModel extends Model {
 	
 	public function getSearchList($params = array(), $page = null, $count = null){
 	    $model = $this->from();
-	     
+	    
+	    Log::notice('getSearchList ==== >>> $params=' . json_encode($params) );
+	    
 	    $where = [];
 	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -80,8 +82,7 @@ class BcsTradeModel extends Model {
                     break;
                 case 'status':
                     if('31' == $params[$val]){
-                        $keys[] = 'status in ( ' .BcsTradeModel::$_status_unknown . ',' . BcsTradeModel::$_status_success . ' ) and \'1\'=? ';
-                        $values[] = '1';
+                        $where[] = 'status in ( ' .BcsTradeModel::$_status_unknown . ',' . BcsTradeModel::$_status_success . ' ) ';
                         break;
                     }
 	            default:
@@ -89,7 +90,7 @@ class BcsTradeModel extends Model {
 	                break;
 	        }
 	    }
-	     
+	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	     
@@ -126,6 +127,7 @@ class BcsTradeModel extends Model {
 	    Log::notice('create ==== >>> param=' . json_encode($param) );
 	    if(! $this->insert(array(
 	        'id'   =>	$param['id'],
+	        'order_id' => $param['order_id'],
 	        'order_no' => $param['order_no'],
 	        'b_user_id' => $param['b_user_id'],
 	        's_user_id' => $param['s_user_id'],
