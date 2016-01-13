@@ -120,6 +120,7 @@ class TradeRecordController extends BaseController {
         $user_id = $req_data['user_id'];
         
         Log::notice('tradeRecord-pay . id=' . $id . ',user_id=' . $user_id . ',req_data==>>' . var_export($req_data, true));
+        
         /**
          * 查询 订单 
          */
@@ -138,8 +139,6 @@ class TradeRecordController extends BaseController {
          */
         $params = array();
         $params['order_status'] = $req_data['order_status'];
-        $params['disenabled_timestamp'] = $req_data['disenabled_timestamp'];
-        
         $tradeRecord_model = $this->model('tradeRecord');
         $res = $tradeRecord_model->updateTradeRecord($params,array('id' => $id,'user_id' => $user_id));
         if(false === $res){
