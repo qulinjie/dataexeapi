@@ -57,11 +57,11 @@ class CertificationModel extends Model
     }
 
     /**
-     * @param array $params ['id']
+     * @param int $user_id
      * @return array
      */
-    public function get($params = array())
+    public function get($user_id = -1)
     {
-        return $this->where($params)->from()->select();
+        return $this->where('user_id=?',$user_id)->from()->select();
     }
 }
