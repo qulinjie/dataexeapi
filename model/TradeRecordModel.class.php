@@ -24,8 +24,7 @@ class TradeRecordModel extends Model {
 	    }
 	     
 	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
-	        'order_id'
+	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'
 	    ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
@@ -82,8 +81,7 @@ class TradeRecordModel extends Model {
 	     
 	    $where = [];
 	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
-	        'order_id'
+	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'
 	    ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){

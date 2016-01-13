@@ -119,6 +119,7 @@ class TradeRecordController extends BaseController {
         $id = $req_data['id'];
         $user_id = $req_data['user_id'];
         
+        Log::notice('tradeRecord-pay . id=' . $id . ',user_id=' . $user_id . ',req_data==>>' . var_export($req_data, true));
         /**
          * 查询 订单 
          */
