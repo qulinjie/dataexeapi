@@ -57,10 +57,12 @@ class BcsRegisterController extends BaseController {
     }
     
     public function update($req_data){
-        $param = array('ACCOUNT_NO' => $req_data['ACCOUNT_NO'],'ACT_TIME' =>date('Y-m-d H:i:s',strtotime($req_data['ACT_TIME'])));
-        $where = array('MCH_NO'     => $req_data['MCH_NO']    ,'SIT_NO' => $req_data['SIT_NO']);
+        $param = array();
+        isset($req_data['ACCOUNT_NO']) && $param['ACCOUNT_NO'] = $req_data['ACCOUNT_NO'];
+        isset($req_data['ACT_TIME']) && $param['ACT_TIME'] = date('Y-m-d H:i:s',strtotime($req_data['ACT_TIME']));
+        $where = array('SIT_NO' => $req_data['SIT_NO']);
         if(!$this->model('bcsRegister')->updateBcsRegister($param,$where)){
-            Log::error('updateBcsRegister faild !');
+            Log::error('updateBcsRegister fail !');
             EC::fail(EC_UPD_REC);
         }
         EC::success(EC_OK);
