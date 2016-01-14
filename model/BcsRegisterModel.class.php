@@ -138,8 +138,8 @@ class BcsRegisterModel extends Model {
 	    return true;
 	}
 
-	public function checkIsExist($user_id,$card){
-		return true == $this->where(array('user_id=?','CUST_SPE_ACCT_NO=?'),array($user_id,$card))->from(null,'id')->select();
+	public function checkIsExist($user_id){
+		return true == $this->where(array('user_id=?'),array($user_id))->from(null,'id')->select();
 	}
 
 
