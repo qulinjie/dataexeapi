@@ -8,11 +8,11 @@ class BcsRegisterModel extends Model {
 	public function getSearchCnt($params = array()){
 	    $keys = array();
 	    $values = array();
-	     
+	    
 	    $keys[] = 'is_delete = ?';
-	    $values[] = BcsRegisterModel::$_is_delete_false;
-	     
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 
+	    $values[] = 1; 
+	    
+	    /* $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 
 	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
@@ -52,7 +52,7 @@ class BcsRegisterModel extends Model {
 	                $values[] = $params[$val];
 	                break;
 	        }
-	    }
+	    } */
 	     
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
@@ -62,7 +62,7 @@ class BcsRegisterModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status',
+	    /* $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status',
 	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
@@ -94,10 +94,10 @@ class BcsRegisterModel extends Model {
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
 	        }
-	    }
-	     
-	    $where[] = 'is_delete=1'; // 1-正常 2-删除
-	     
+	    } */
+	    
+	    $where[] = "is_delete = 1";
+	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	     
