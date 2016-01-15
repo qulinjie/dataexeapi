@@ -12,8 +12,7 @@ class BcsRegisterModel extends Model {
 	    $keys[] = 'is_delete = ?';
 	    $values[] = 1; 
 	    
-	    /* $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -27,32 +26,12 @@ class BcsRegisterModel extends Model {
 	                $keys[] = "add_timestamp <= ?";
 	                $values[] = $params[$val];
 	                break;
-                case 'order_time1':
-                    $keys[] = "order_timestamp >= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'order_time2':
-                    $keys[] = "order_timestamp <= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'seller_name':
-                    $keys[] = "{$val} like ?";
-                    $values[] = '%' . $params[$val] . '%';
-                    break;
-                case 'order_sum_amount1':
-                    $keys[] = "order_sum_amount >= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'order_sum_amount2':
-                    $keys[] = "order_sum_amount <= ?";
-                    $values[] = $params[$val];
-                    break;
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
 	                break;
 	        }
-	    } */
+	    }
 	     
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
@@ -62,8 +41,7 @@ class BcsRegisterModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    /* $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2'];
+	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -75,26 +53,11 @@ class BcsRegisterModel extends Model {
 	            case 'time2':
 	                $where[] = "add_timestamp <= '{$params[$val]}'";
 	                break;
-                case 'order_time1':
-                    $where[] = "order_timestamp >= '{$params[$val]}'";
-                    break;
-                case 'order_time2':
-                    $where[] = "order_timestamp <= '{$params[$val]}'";
-                    break;
-                case 'seller_name':
-                    $where[] = "{$val} like '%{$params[$val]}%'";
-                    break;
-                case 'order_sum_amount1':
-                    $where[] = "order_sum_amount >= '{$params[$val]}'";
-                    break;
-                case 'order_sum_amount2':
-                    $where[] = "order_sum_amount <= '{$params[$val]}'";
-                    break;
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
 	        }
-	    } */
+	    }
 	    
 	    $where[] = "is_delete = 1";
 	    
