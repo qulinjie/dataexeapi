@@ -75,27 +75,15 @@ class BcsRegisterController extends BaseController {
     }
     
     public function create($req_data){
-        $session = self::instance('session');
-        if(!$loginUser = $session->get('loginUser')){
-            Log::error('create not login');
-            EC::fail(EC_NOT_LOGIN);
-        }
-
-        if($this->model('bcsRegister')->checkIsExist($loginUser['id'])){
-             Log::error('bank card already exists');
-             EC::fail(EC_REC_EST);
-        }
-
-        $req_data['id']         = $this->model('id')->getBcsRegisterId();
-        $req_data['user_id']    = $loginUser['id'];
-        $req_data['ACCOUNT_NO'] = '';
-        $req_data['SIT_NO']     = $this->model('id')->getSitNo();
-
-        if(!$this->model('bcsRegister')->createBcsRegister($req_data)){
-            Log::error('createBcsRegister Fail! rollback .');
+        $id = $this->model('id')->getBcsRegisterId();
+        $req_data['id'] = $id;
+        $code_model = $this->model('bcsRegister');
+        $data = $code_model->createBcsRegister($req_data);
+        if(false === $data){
+            Log::error('createAuthCode Fail!');
             EC::fail(EC_ADD_REC);
         }
-        EC::success(EC_OK,['SIT_NO' => $req_data['SIT_NO']]);
+        EC::success(EC_OK,$id);
     }
 
     private function getSitNo($req_data)

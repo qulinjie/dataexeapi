@@ -94,7 +94,30 @@ class BcsRegisterModel extends Model {
 	}
 	
 	public function createBcsRegister($param = array()){
-	    if(! $this->insert($param)){
+	    if(! $this->insert(array(
+	        'id'   =>	$param['id'],
+	        'user_id' => $param['user_id'],
+	        'MCH_NO'               => $param['MCH_NO'],    // 商户编号
+	        'SIT_NO'               => $param['SIT_NO'],                // 客户证件类型
+	        'CUST_CERT_TYPE'       => $param['CUST_CERT_TYPE'],          // 客户证件类型
+	        'CUST_CERT_NO'         => $param['CUST_CERT_NO'],            // 客户证件号码
+	        'CUST_NAME'            => $param['CUST_NAME'],          // 客户名称
+	        'CUST_ACCT_NAME'       => $param['CUST_ACCT_NAME'],      // 客户账户名
+	        'CUST_SPE_ACCT_NO'     => $param['CUST_SPE_ACCT_NO'],     // 客户结算账户
+	        'CUST_SPE_ACCT_BKTYPE' => $param['CUST_SPE_ACCT_BKTYPE'],    // 客户结算账户行别
+	        'CUST_SPE_ACCT_BKID'   => $param['CUST_SPE_ACCT_BKID'],	// 客户结算账户行号
+	        'CUST_SPE_ACCT_BKNAME' => $param['CUST_SPE_ACCT_BKNAME'],	// 客户结算账户行名
+	        'ENABLE_ECDS'          => $param['ENABLE_ECDS'],        // 是否开通电票
+	        'IS_PERSON'            => $param['IS_PERSON'],          // 是否个人
+	        'CUST_PHONE_NUM'       => $param['CUST_PHONE_NUM'],      // 客户手机号码
+	        'CUST_TELE_NUM'        => $param['CUST_TELE_NUM'],       // 客户电话号码
+	        'CUST_ADDR'            => $param['CUST_ADDR'],       // 客户地址
+	        'RMRK'                 => $param['RMRK'],           // 客户备注
+	        'comment'              => $param['comment'],           // 备注
+	        'status'	=>	3,
+	        'is_delete'	=>	1,
+	        'add_timestamp' => date('Y-m-d H:i:s',time())
+	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
 	        return false;
 	    }
