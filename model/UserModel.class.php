@@ -251,4 +251,73 @@ class UserModel extends Model {
 	{
 		return $this->count(null,'id',$params);
 	}
+
+	
+	
+	
+	public function getSearchCnt($params = array()){
+	    $keys = array();
+	    $values = array();
+	     
+	    $keys[] = 'is_delete = ?';
+	    $values[] = 1;
+	     
+	    $fields = [ 'status', 'nicename', 'account', 'time1', 'time2'];
+	    foreach ($fields as $key => $val){
+	        if( !$params[$val] ){
+	            continue;
+	        }
+	        switch ( $val ) {
+	            case 'time1':
+	                $keys[] = "add_timestamp >= ?";
+	                $values[] = $params[$val];
+	                break;
+	            case 'time2':
+	                $keys[] = "add_timestamp <= ?";
+	                $values[] = $params[$val];
+	                break;
+	            default:
+	                $keys[] = "{$val}=?";
+	                $values[] = $params[$val];
+	                break;
+	        }
+	    }
+	
+	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
+	    return $this->count(null, 'id', $keys, $values);
+	}
+	
+	public function getSearchList($params = array(), $page = null, $count = null){
+	    $model = $this->from();
+	
+	    $where = [];
+	    $fields = [ 'status', 'nicename', 'account', 'time1', 'time2'];
+	    foreach ($fields as $key => $val){
+	        if( !$params[$val] ){
+	            continue;
+	        }
+	        switch ( $val ) {
+	            case 'time1':
+	                $where[] = "add_timestamp >= '{$params[$val]}'";
+	                break;
+	            case 'time2':
+	                $where[] = "add_timestamp <= '{$params[$val]}'";
+	                break;
+	            default:
+	                $where[] = "{$val}='{$params[$val]}'";
+	                break;
+	        }
+	    }
+	     
+	    $where[] = "is_delete = 1";
+	     
+	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
+	    $model->where( $where );
+	
+	    if($page && $count){
+	        $model->pageLimit($page, $count);
+	    }
+	    return $model->order('add_timestamp desc')->select();
+	}
+	
 }

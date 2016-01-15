@@ -4,6 +4,12 @@ class UserController extends Controller {
 
     public function handle($params = array(), $req_data = array()) {
         switch ($params[0]) {
+            case 'searchCnt':
+                $this->getSearchCnt($req_data);
+                break;
+            case 'searchList':
+                $this->getSearchList($req_data);
+                break;
             case "sendSmsCode":
                 $this->sendSmsCode($req_data);
                 break;
@@ -53,6 +59,26 @@ class UserController extends Controller {
 		}
 	}
 
+	
+	public function getSearchCnt($req_data){
+	    $code_model = $this->model('user');
+	    $data = $code_model->getSearchCnt($req_data);
+	    EC::success(EC_OK,$data);
+	}
+	
+	public function getSearchList($req_data){
+	    $current_page = $req_data['current_page'];
+	    $page_count = $req_data['page_count'];
+	    unset($req_data['current_page']);
+	    unset($req_data['page_count']);
+	    $params = $req_data;
+	
+	    $code_model = $this->model('user');
+	    $data = $code_model->getSearchList($params, $current_page, $page_count);
+	
+	    EC::success(EC_OK,$data);
+	}
+	
 	private function login($req_data){
 	    $user_model = $this->model('user');
 	    $user_info = $user_model->getUserInfoByTel($req_data['tel'],array(),true);
