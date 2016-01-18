@@ -52,13 +52,35 @@ class UserController extends Controller {
 			case 'getList':
 				$this->getList($req_data);
 				break;
+			case 'update':
+			    $this->update($req_data);
+			    break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
 				break;
 		}
 	}
-
+	
+	public function update($req_data)
+	{
+	    $params = [
+	        'account'      => $req_data['account'] ,
+	        'nicename'     => $req_data['real_name'],
+	        'comment'      => $req_data['comment'],
+	        'status'       => $req_data['status'],
+	        'company_name' => $req_data['company_name'],
+	        'personal_authentication_status' => $req_data['personal_authentication_status'],
+	        'company_authentication_status'  => $req_data['company_authentication_status']	               
+	    ];
+	    
+	    if(!$this->model('user')->updateUser($params,['id' => $req_data['id']])){
+	        Log::error('User update error');
+	        EC::fail(EC_UPD_REC);
+	    }
+	    
+	    EC::success(EC_OK);  	    
+	}
 	
 	public function getSearchCnt($req_data){
 	    $code_model = $this->model('user');
@@ -75,6 +97,19 @@ class UserController extends Controller {
 	
 	    $code_model = $this->model('user');
 	    $data = $code_model->getSearchList($params, $current_page, $page_count);
+	    
+	    $cert_model = $this->model('certification');
+	    $fields = array('real_name','legal_name','company_name','business_license');
+	    foreach ($data as $key => $val){
+	        if($cert = $cert_model->get($val['id'],$fields)){
+	            $data[$key] = array_merge($data[$key],$cert[0]);	          
+	        }else{
+	            $data[$key]['real_name']        = '';
+	            $data[$key]['legal_name']       = '';
+	            $data[$key]['company_name']     = '';
+	            $data[$key]['business_license'] = '';
+	        }
+	    }
 	
 	    EC::success(EC_OK,$data);
 	}
