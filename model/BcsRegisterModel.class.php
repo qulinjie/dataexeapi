@@ -95,8 +95,8 @@ class BcsRegisterModel extends Model {
 	
 	public function createBcsRegister($param = array()){
 	    if(! $this->insert(array(
-	        'id'   =>	$param['id'],
-	        'user_id' => $param['user_id'],
+	        'id'                   => $param['id'],
+	        'user_id'              => $param['user_id'],
 	        'MCH_NO'               => $param['MCH_NO'],    // 商户编号
 	        'SIT_NO'               => $param['SIT_NO'],                // 客户证件类型
 	        'CUST_CERT_TYPE'       => $param['CUST_CERT_TYPE'],          // 客户证件类型

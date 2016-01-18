@@ -74,16 +74,17 @@ class BcsRegisterController extends BaseController {
         EC::success(EC_OK,$data);
     }
     
-    public function create($req_data){
-        $id = $this->model('id')->getBcsRegisterId();
-        $req_data['id'] = $id;
+    public function create($req_data){      
+        $req_data['id']     = $this->model('id')->getBcsRegisterId();
+        $req_data['SIT_NO'] = $this->model('id')->getSitNo();
+        
         $code_model = $this->model('bcsRegister');
         $data = $code_model->createBcsRegister($req_data);
         if(false === $data){
-            Log::error('createAuthCode Fail!');
+            Log::error('bcsRegister create Fail!');
             EC::fail(EC_ADD_REC);
         }
-        EC::success(EC_OK,$id);
+        EC::success(EC_OK,['SIT_NO' => $req_data['SIT_NO']]);
     }
 
     private function getSitNo($req_data)
