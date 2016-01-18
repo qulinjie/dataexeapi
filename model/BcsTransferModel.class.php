@@ -9,8 +9,10 @@ class BcsTransferModel extends Model {
 	    $keys = array();
 	    $values = array();
 	     
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
+	    $keys[] = 'is_delete = ?';
+	    $values[] = 1;
+	    
+	    $fields = [ 'user_id', 'SIT_NO', 'time1', 'time2', 'FMS_TRANS_NO', 'status' ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -24,18 +26,6 @@ class BcsTransferModel extends Model {
 	                $keys[] = "add_timestamp <= ?";
 	                $values[] = $params[$val];
 	                break;
-                case 'seller_name':
-                    $keys[] = "{$val} like ?";
-                    $values[] = '%' . $params[$val] . '%';
-                    break;
-                case 'amount1':
-                    $keys[] = "TX_AMT >= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'amount2':
-                    $keys[] = "TX_AMT <= ?";
-                    $values[] = $params[$val];
-                    break;
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
@@ -51,8 +41,7 @@ class BcsTransferModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2' ];
+	    $fields = [ 'user_id', 'SIT_NO', 'time1', 'time2', 'FMS_TRANS_NO', 'status' ];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -64,21 +53,14 @@ class BcsTransferModel extends Model {
 	            case 'time2':
 	                $where[] = "add_timestamp <= '{$params[$val]}'";
 	                break;
-                case 'seller_name':
-                    $where[] = "{$val} like '%{$params[$val]}%'";
-                    break;
-                case 'amount1':
-                    $where[] = "TX_AMT >= '{$params[$val]}'";
-                    break;
-                case 'amount2':
-                    $where[] = "TX_AMT <= '{$params[$val]}'";
-                    break;
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
 	        }
 	    }
 	     
+	    $where[] = "is_delete = 1";
+	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	     
