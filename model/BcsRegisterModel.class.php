@@ -33,6 +33,15 @@ class BcsRegisterModel extends Model {
 	        }
 	    }
 	     
+	    if($params['user_id_list'] && !empty($params['user_id_list']) ){
+	        $user_id_str = '';
+	        foreach ($params['user_id_list'] as $val){
+	            $user_id_str =  $user_id_str . $val . ',';
+	        }
+	        $keys[] = 'user_id in ( ' . substr($user_id_str,0,-1) .' ) and \'1\'=? ';
+	        $values[] = '1';
+	    }
+	    
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
 	}
@@ -64,6 +73,10 @@ class BcsRegisterModel extends Model {
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	     
+	    if($params['user_id_list'] && !empty($params['user_id_list']) ){
+	        $model->where(array('user_id' => $params['user_id_list']));
+	    }
+	    
 	    if($page && $count){
 	        $model->pageLimit($page, $count);
 	    }
