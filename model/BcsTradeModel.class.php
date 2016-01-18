@@ -50,7 +50,25 @@ class BcsTradeModel extends Model {
 	                break;
 	        }
 	    }
-	     
+	    
+	    
+	    if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
+	        $s_user_id_str = '';
+	        foreach ($params['s_user_id_list'] as $val){
+	            $s_user_id_str =  $s_user_id_str . $val . ',';
+	        }
+	        $keys[] = 's_user_id in ( ' . substr($s_user_id_str,0,-1) .' ) and \'1\'=? ';
+	        $values[] = '1';
+	    }
+	    if($params['b_user_id_list'] && !empty($params['b_user_id_list']) ){
+	        $b_user_id_str = '';
+	        foreach ($params['b_user_id_list'] as $val){
+	            $b_user_id_str =  $b_user_id_str . $val . ',';
+	        }
+	        $keys[] = 'b_user_id in ( ' . substr($b_user_id_str,0,-1) .' ) and \'1\'=? ';
+	        $values[] = '1';
+	    }
+	    
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
 	}
@@ -98,7 +116,14 @@ class BcsTradeModel extends Model {
 	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
-	     
+	    
+	    if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
+	        $model->where(array('s_user_id' => $params['s_user_id_list']));
+	    }
+	    if($params['b_user_id_list'] && !empty($params['b_user_id_list']) ){
+	        $model->where(array('b_user_id' => $params['b_user_id_list']));
+	    }
+	    
 	    if($page && $count){
 	        $model->pageLimit($page, $count);
 	    }
