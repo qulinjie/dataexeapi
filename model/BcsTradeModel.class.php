@@ -14,6 +14,9 @@ class BcsTradeModel extends Model {
 	    $keys = array();
 	    $values = array();
 	     
+	    $keys[] = 'is_delete = ?';
+	    $values[] = 1;
+	    
 	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
                     'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id' ];
 	    foreach ($fields as $key => $val){
@@ -90,6 +93,8 @@ class BcsTradeModel extends Model {
 	                break;
 	        }
 	    }
+	    
+	    $where[] = "is_delete = 1";
 	    
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );

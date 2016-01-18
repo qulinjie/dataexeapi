@@ -276,6 +276,10 @@ class UserModel extends Model {
 	                $keys[] = "add_timestamp <= ?";
 	                $values[] = $params[$val];
 	                break;
+                case 'nicename':
+                    $keys[] = "{$val} like ?";
+                    $values[] = '%' . $params[$val] . '%';
+                    break;
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
@@ -303,6 +307,9 @@ class UserModel extends Model {
 	            case 'time2':
 	                $where[] = "add_timestamp <= '{$params[$val]}'";
 	                break;
+                case 'nicename':
+                    $where[] = "nicename like '%{$params[$val]}%'";
+                    break;
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
@@ -314,6 +321,10 @@ class UserModel extends Model {
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	
+	    if($params['user_id_list'] && is_array($params['user_id_list']) && !empty($params['user_id_list'])){
+	        $model->where( array('id' => $params['user_id_list']) );
+	    }
+	    
 	    if($page && $count){
 	        $model->pageLimit($page, $count);
 	    }
