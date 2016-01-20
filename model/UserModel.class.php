@@ -113,6 +113,7 @@ class UserModel extends Model {
 	}
 	
 	public function getList($params = array() , $fields = '*'){
-	    return $this->from(null,$fields)->where($params)->select();
+	    $params && $this->where($params);
+	    return $this->from(null,$fields)->select();
 	}
 }

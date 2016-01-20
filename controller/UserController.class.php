@@ -50,7 +50,7 @@ class UserController extends Controller {
 	        $fields = $req_data['fields'];
 	        unset($req_data['fields']);
 	    }
-	    
+	   
 	    $data = $this->model('user')->getList($req_data,$fields);
 	    EC::success(EC_OK,$data);
 	}
