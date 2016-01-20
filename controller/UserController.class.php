@@ -30,7 +30,10 @@ class UserController extends Controller {
 				break;
 			case 'update':
 			    $this->update($req_data);
-			    break;		
+			    break;	
+		    case 'getInfo':
+		        $this->getInfo($req_data);
+		        break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -66,6 +69,12 @@ class UserController extends Controller {
 	    }
 	    
 	    EC::success(EC_OK);  	    
+	}
+	
+	public function getInfo($req_data){
+	    $code_model = $this->model('user');
+	    $data = $code_model->getInfoUser($req_data, array());
+	    EC::success(EC_OK,$data);
 	}
 	
 	public function getSearchCnt($req_data){

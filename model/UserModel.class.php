@@ -5,6 +5,10 @@ class UserModel extends Model {
 		return 'c_user';
 	}	
 	
+	// 是否删除 1-正常 2-已删除
+	public static $_is_delete_false = 1;
+	public static $_is_delete_true = 2;
+	
 	public function createUser($param = array()){
 		if(! $this->insert(array(
                 				'id'	       => $param['id'],
@@ -116,4 +120,15 @@ class UserModel extends Model {
 	    $params && $this->where($params);
 	    return $this->from(null,$fields)->select();
 	}
+
+	public function getInfoUser($where = array(),$fields = array()){
+	    Log::notice('getInfo ==== >>> where=' . json_encode($where) );
+	    if(empty($fields)){
+	        $data = $this->where($where)->where(array('is_delete'=>UserModel::$_is_delete_false))->from()->select();
+	    }else{
+	        $data = $this->where($where)->where(array('is_delete'=>UserModel::$_is_delete_false))->from(null,$fields)->select();
+	    }
+	    return $data;
+	}
+	
 }
