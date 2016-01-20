@@ -4,6 +4,15 @@ class UserController extends Controller {
 
     public function handle($params = array(), $req_data = array()) {
         switch ($params[0]) {
+            case "login":
+                $this->login($req_data);
+                break;
+            case "getLoginUser":
+                $this->getLoginUser($req_data);
+                break;
+            case "loginOut":
+                $this->loginOut();
+                break;
             case 'searchCnt':
                 $this->getSearchCnt($req_data);
                 break;
@@ -15,46 +24,13 @@ class UserController extends Controller {
                 break;
             case "register":
                 $this->register($req_data);
-                break;
-            case "login":
-                $this->login($req_data);
-                break;
-			case "isLogin":
-				$this->isLogin($req_data);
-				break;
-			case "getLoginUser":
-				$this->getLoginUser($req_data);
-				break;
-            case "loginOut":
-                $this->loginOut();
-                break;
-			case 'updatePersonalAuthInfo': //更新个人认证信息
-				$this->updatePersonalAuthInfo($req_data);
-				break;
-			case 'updateCompanyAuthInfo': //更新企业认证信息
-				$this->updateCompanyAuthInfo($req_data);
-				break;
-			case 'loginPasswordReset': //登录密码重置
-				$this->loginPasswordReset($req_data);
-				break;
-			case "getUserBasicInfo":
-			    $this->getUserBasicInfo($req_data);
-			    break;
-			case "getUserInfo":
-			    $this->getUserInfo($req_data);
-			    break;
-			case 'isAdmin':
-				$this->isAdmin($req_data);
-				break;
-			case 'getCnt':
-				$this->getCnt($req_data);
-				break;
+                break;            	
 			case 'getList':
 				$this->getList($req_data);
 				break;
 			case 'update':
 			    $this->update($req_data);
-			    break;
+			    break;		
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -62,19 +38,29 @@ class UserController extends Controller {
 		}
 	}
 	
-	public function update($req_data)
+	/**
+	 * 获取用户列表
+	 * 备注：查询指定列 ，请传 fields = [...] 
+	 */
+	public function getList($req_data)
 	{
-	    $params = [
-	        'account'      => $req_data['account'] ,
-	        'nicename'     => $req_data['real_name'],
-	        'comment'      => $req_data['comment'],
-	        'status'       => $req_data['status'],
-	        'company_name' => $req_data['company_name'],
-	        'personal_authentication_status' => $req_data['personal_authentication_status'],
-	        'company_authentication_status'  => $req_data['company_authentication_status']	               
-	    ];
+	    //默认全部字段
+	    $fields = '*';    
+	    if(isset($req_data['fields'])){
+	        $fields = $req_data['fields'];
+	        unset($req_data['fields']);
+	    }
 	    
-	    if(!$this->model('user')->updateUser($params,['id' => $req_data['id']])){
+	    $data = $this->model('user')->getList($req_data,$fields);
+	    EC::success(EC_OK,$data);
+	}
+	
+	public function update($req_data)
+	{	    
+	    $id = $req_data['id'];
+	    unset($req_data['id']);
+	    
+	    if(!$this->model('user')->updateUser($req_data,['id' => $id])){
 	        Log::error('User update error');
 	        EC::fail(EC_UPD_REC);
 	    }
@@ -116,33 +102,33 @@ class UserController extends Controller {
 	
 	private function login($req_data){
 	    $user_model = $this->model('user');
-	    $user_info = $user_model->getUserInfoByTel($req_data['tel'],array(),true);
+	    $user_info  = $user_model->getList(array('account' => $req_data['tel'] ),array('id','account','password','pay_password','nicename','company_name','status','is_delete'));
 
-	    if(empty($user_info) ) {
+	    if(!$user_info || $user_info[0]['is_delete'] == '2') {
 	        Log::error('login . user not exsit . ');//用户不存在
 	        EC::fail(EC_LOGIN_PAR_REC);
-	    } else if($user_info['status'] == '2') {
-			Log::error('login . user disable! id=' . $user_info['id']);
+	    } else if($user_info[0]['status'] == '2') {
+			Log::error('login . user disable! id=' . $user_info[0]['id']);
 			EC::fail(EC_USE_UNA);
 		}
-	    if(UserController::buildPassword($user_info['id'], $req_data['pwd']) != $user_info['password']){
+		
+	    if(UserController::buildPassword($user_info[0]['id'], $req_data['pwd']) != $user_info[0]['password']){
 	        Log::error('login . pwd error');//密码错误
 	        EC::fail(EC_LOGIN_PAR_REC);
 	    }
 
 	    //设置已登录
-	    $this->setLoginSession($user_info);
+	    //$this->setLoginSession($user_info[0]);
 
 	    $session = Controller::instance('session');
-	    unset( $user_info['password'] );
-	    $session->set('loginUser', $user_info);
+	    $session->set('loginUser', $user_info[0]);
 
 	    Log::notice('end login . sessionId=' . $session->get_id() );
 	    // check
 	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('loginUser')) );
 	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('loginUser')) );
 
-	    EC::success(EC_OK,$user_info);
+	    EC::success(EC_OK,$user_info[0]);
 	}
 
 	private function loginOut(){
@@ -168,8 +154,8 @@ class UserController extends Controller {
 	    $session->set('tel', $session_data['tel']);
 	    $session->set('auth_id', $session_data['auth_id']);
 	    $session->set('name', $session_data['name']);
-	    unset( $session_data['password'] );
-		unset( $session_data['pay_password'] );//支付密码一起删除
+	    //unset( $session_data['password'] );
+		//unset( $session_data['pay_password'] );//支付密码一起删除
 	    $session->set('loginUser', $session_data);
 	}
 
@@ -193,13 +179,10 @@ class UserController extends Controller {
 
 	    //判断用户是否已存在(没注册过或者未被删除)
 	    $user_model = $this->model('user');
-	    $user_data = $user_model->getUserInfoByTel($req_data['tel'],array(),true);
-	    if(!empty($user_data) && $user_data['status'] == '1'){
+	    $user_data = $user_model->getList(array('account' => $req_data['tel']),array('id','account','status'));
+	    if($user_data || $user_data[0]['is_delete'] == '2'){
 	        Log::error('user exist:' . $req_data['tel']);
 	        EC::fail(EC_USR_EST);
-	    }else if(!empty($user_data) && $user_data['enabled_status'] == '2'){
-	        Log::error('user disable:' . $req_data['tel']);
-	        EC::fail(EC_USE_UNA);
 	    }
 
 	    $user_id = $this->model('id')->getUserId();
@@ -213,8 +196,8 @@ class UserController extends Controller {
 	    //注册用户写入数据库
 		try{
 			$user_model->startTrans();
-			if(!$user_model->createUser(array('id'=>$user_id,'tel'=>$req_data['tel'],'name'=>'','password'=>$md5_pwd))
-			   ||!$this->model('certification')->add($certification_id,$user_id)){
+			if(!$user_model->createUser(array('id'=>$user_id,'tel'=>$req_data['tel'],'password'=>$md5_pwd))
+			   ||!$this->model('cert')->createCert(array('id' => $certification_id, 'user_id' => $user_id))){
 				throw new Exception(); //错误信息，底层sql有写文件
 			}
 
@@ -229,26 +212,20 @@ class UserController extends Controller {
 	    EC::success(EC_OK,array('register_certification_id' => $certification_id));
 	}
 
-	/**
-	 * 发送验证码
-	 * @param unknown $req_data
-	 */
+
 	private function sendSmsCode($req_data){
 	    $tel = $req_data['tel'];
 	    // 1-注册 2-找回密码
 	    $type = $req_data['type'] ? $req_data['type'] : 1;
 
-	    $checkisreg = $this->model('user')->getUserInfoByTel($tel,array('id','account','status'),true);
+	    $checkisreg = $this->model('user')->getList(array('account' => $tel),array('id','account','status'));
 	    if($type == '1'){
-	        if(!empty($checkisreg) && $checkisreg['status'] == '1'){
+	        if($checkisreg){
 	            Log::error('user exist . tel=' . $tel);
 	            EC::fail(EC_USR_EST);
-	        }else if(!empty($checkisreg) && $checkisreg['status'] == '2'){
-	            Log::error('the user is disable!');
-	            EC::fail(EC_USE_UNA);
 	        }
 	    }else if($type == '2'){
-	        if(empty($checkisreg)){
+	        if(!$checkisreg || $checkisreg[0]['is_delete'] == 2){
 	            Log::error(' user not exist . tel=' . $tel);
 	            EC::fail(EC_USR_NON);
 	        }
@@ -282,12 +259,7 @@ class UserController extends Controller {
 		EC::success(EC_OK);
 	}
 
-	/**
-	 * 发送验证码
-	 * @param unknown $phonenum
-	 * @param unknown $code
-	 * @param unknown $type
-	 */
+	
 	public function sendCode($phonenum,$code,$type){
 	    $sms = $this->instance('sms');
 	    //获取配置信息
@@ -311,9 +283,6 @@ class UserController extends Controller {
 	    }
 	}
 
-	/**
-	 *验证码生成
-	 */
 	private function createCode(){
 	    $verify_model = $this->model('verify');
 	    $conf = $this->getConfig('conf');
@@ -328,11 +297,6 @@ class UserController extends Controller {
 	    return $code;
 	}
 
-	/**
-	 * 写入验证码
-	 * @param unknown $tel
-	 * @param unknown $code
-	 */
 	private function addOrUpdVerifyCode($tel,$code){
 	    $conf = $this->getConfig('conf');
 	    $code_expire = $conf['code_expire'];
@@ -348,12 +312,6 @@ class UserController extends Controller {
 	    return true;
 	}
 
-	/**
-	 * 检查验证码
-	 * @param $tel
-	 * @param $code
-	 * @return int
-	 */
 	public static function checkCmsCode($tel,$code){
 		$verify_model = self::model('verify');
 		$verify_data  = $verify_model->getVerifyRecordByTel($tel,$code);
@@ -370,141 +328,14 @@ class UserController extends Controller {
 		return EC_OK;
 	}
 
-	/**
-	 * @param $req_data['realName','filePath','fileName','id']
-	 */
-    private function updatePersonalAuthInfo($req_data) {
-        if (!$req_data['realName'] || !$req_data['filePath'] || !$req_data['fileName'] || !$req_data['id']) {
-            Log::error('updatePersonalAuth params is empty');
-            EC::fail(EC_PAR_BAD);
-        }
-
-        if (!$certInfo = $this->model('certification')->get(array('id' => $req_data['id']))) {
-            Log::error('updatePersonalAuth data not exists id=' . $req_data['id']);
-            EC::fail(EC_DAT_NON);
-        }
-
-        try {
-            $this->model('certification')->startTrans();
-            if (!$this->model('certification')->updatePersonalAuth($req_data['realName'],$req_data['fileName'],$req_data['filePath'], $req_data['id'])
-                || !$this->model('user')->updatePersonalAuth(2,$certInfo[0]['user_id'])) {
-                throw new Exception('certificationModel method updatePersonalAuth is fail ');
-            }
-            $this->model('certification')->commit();
-        } catch (Exception $e) {
-            $this->model('certification')->rollback();
-            Log::error('updatePersonalAuthInfo is fail msg (' . $e->getMessage() . ')');
-            EC::fail(EC_OTH);
-        }
-
-        EC::success(EC_OK);
-	}
-
-    /**
-     * @param $req_data['legalPerson','companyName','license','filePath','fileName','id']
-     */
-    private function updateCompanyAuthInfo($req_data)
-    {
-        if (!$req_data['legalPerson'] || !$req_data['companyName'] ||!$req_data['license'] || !$req_data['filePath'] || !$req_data['fileName'] || !$req_data['id']) {
-            Log::error('updateCompanyAuthInfo params is empty');
-            EC::fail(EC_PAR_BAD);
-        }
-
-        if (!$certInfo = $this->model('certification')->get(array('id' => $req_data['id']))) {
-            Log::error('updateCompanyAuthInfo data not exists id=' . $req_data['id']);
-            EC::fail(EC_DAT_NON);
-        }
-
-        try {
-            $this->model('certification')->startTrans();
-            if (!$this->model('certification')->updateCompanyAuth($req_data['legalPerson'],$req_data['companyName'],$req_data['license'],$req_data['fileName'],$req_data['filePath'], $req_data['id']) ||
-                !$this->model('user')->updateCompanyAuth(2,$certInfo[0]['user_id'])) {
-                throw new Exception('certificationModel method updateCompanyAuth is fail ');
-            }
-            $this->model('certification')->commit();
-        } catch (Exception $e) {
-            $this->model('certification')->rollback();
-            Log::error('updateCompanyAuthInfo is fail msg (' . $e->getMessage() . ')');
-            EC::fail(EC_OTH);
-        }
-
-        EC::success(EC_OK);
-    }
-
-	private function isLogin($req_data)
-	{
-		$session = self::instance('session');
-		$data ['isLogin'] = $session->get('loginUser') ? 1 : 0;
-		EC::success(EC_OK,$data);
-	}
-
 	private function getLoginUser($req_data)
 	{
 		$session = self::instance('session');
-		if(!$data ['loginUser'] = $session->get('loginUser')){
-			$data ['loginUser'] = [];
-		}
-
-		EC::success(EC_OK,$data);
-	}
-
-	private function loginPasswordReset($req_data)
-	{
-		$session = self::instance('session');
 		if(!$loginUser = $session->get('loginUser')){
-			Log::error('setPassword not Login');
+		    Log::error('User getLoginUser not login');
 			EC::fail(EC_NOT_LOGIN);
 		}
 
-		$basicInfo = $this->model('user')->getUserBasicInfo($loginUser['id']);
-		if($basicInfo['password'] != self::buildPassword($basicInfo['id'], $req_data['oldPwd'])){
-			Log::error('setPassword oldPassword error');
-			EC::fail(EC_PWD_WRN);
-		}
-
-		$params = array('password' => self::buildPassword($basicInfo['id'],$req_data['newPwd']));
-
-
-		if(!$this->model('user')->updateUser($params,array('id' => $basicInfo['id']))){
-			Log::error('setPassword update password error msg('.$this->model('user')->getErrorInfo().')');
-			EC::fail(EC_PWD_UPD);
-		}
-
-		MessageController::addMsg($loginUser['id'],200);
-		EC::success(EC_OK);
-	}
-
-	private function getUserBasicInfo($req_data)
-	{
-	    $user_model = $this->model('user');
-	    $user_info = $user_model->getUserBasicInfo($req_data['id'],array(),true);
-	    EC::success(EC_OK,$user_info);
-	}
-
-	public function getUserInfo($req_data){
-	    $code_model = $this->model('user');
-	    $data = $code_model->getUserInfo($req_data, array());
-	    EC::success(EC_OK,$data);
-	}
-
-	private function isAdmin($req_data)
-	{
-		$session = self::instance('session');
-		if(!$loginUser = $session->get('loginUser')){
-			Log::error('setPassword not Login');
-			EC::fail(EC_NOT_LOGIN);
-		}
-
-		EC::success(EC_OK,['status' => $loginUser['account'] == 'admin']);
-	}
-
-	private function getCnt($req_data)
-	{
-		EC::success(EC_OK,$this->model('user')->getCnt());
-	}
-
-	private function getList($req_data)
-	{
-
+		EC::success(EC_OK,$loginUser);
 	}
 }
