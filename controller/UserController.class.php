@@ -84,13 +84,13 @@ class UserController extends Controller {
 	    $code_model = $this->model('user');
 	    $data = $code_model->getSearchList($params, $current_page, $page_count);
 	    
-	    $cert_model = $this->model('certification');
-	    $fields = array('real_name','legal_name','company_name','business_license');
+	    $cert_model = $this->model('cert');
+	    $fields = array('nicename','legal_name','company_name','business_license');
 	    foreach ($data as $key => $val){
-	        if($cert = $cert_model->get($val['id'],$fields)){
+	        if($cert = $cert_model->getList(array('user_id' => $val['id']),$fields)){
 	            $data[$key] = array_merge($data[$key],$cert[0]);	          
 	        }else{
-	            $data[$key]['real_name']        = '';
+	            $data[$key]['nicename']         = '';
 	            $data[$key]['legal_name']       = '';
 	            $data[$key]['company_name']     = '';
 	            $data[$key]['business_license'] = '';
