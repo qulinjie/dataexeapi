@@ -63,6 +63,7 @@ class BcsCustomerController extends BaseController {
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
         }
+        Log::notice("update=========================================>>>updateBcsCustomer=" . $res);
         EC::success(EC_OK,$res);
     }
     
