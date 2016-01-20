@@ -58,7 +58,7 @@ class BcsTradeController extends BaseController {
         unset($req_data['id']);
         
         $bcsTrade_model = $this->model('bcsTrade');
-        $res = $bcsTrade_model->updateBcsTransfer($req_data,array('id' => $id));
+        $res = $bcsTrade_model->updateBcsTrade($req_data,array('id' => $id));
         if(false === $res){
             Log::error('updateBcsTransfer faild !');
             EC::fail(EC_UPD_REC);
