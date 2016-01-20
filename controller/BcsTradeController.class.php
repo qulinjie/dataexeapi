@@ -54,18 +54,13 @@ class BcsTradeController extends BaseController {
     }
     
     public function update($req_data){
-        $id = $req_data['bcs_trade_id'];
-
-        $params = array();
-        $params['FMS_TRANS_NO'] = $req_data['FMS_TRANS_NO']; // 资金监管系统交易流水号
-        $params['TRANS_TIME'] = $req_data['TRANS_TIME']; // 交易完成时间 时间格式：YYYY-MM-DD HH24:MI:SS
-        $params['comment'] = $req_data['comment'];
-        $params['status'] = $req_data['status'];
+        $id = $req_data['id'];
+        unset($req_data['id']);
         
         $bcsTrade_model = $this->model('bcsTrade');
-        $res = $bcsTrade_model->updateBcsTrade($params,array('id' => $id));
+        $res = $bcsTrade_model->updateBcsTransfer($req_data,array('id' => $id));
         if(false === $res){
-            Log::error('updateBcsTrade faild !');
+            Log::error('updateBcsTransfer faild !');
             EC::fail(EC_UPD_REC);
         }
         EC::success(EC_OK);
