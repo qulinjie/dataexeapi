@@ -20,15 +20,12 @@ class BcsRegisterController extends BaseController {
                 case 'update':
                     $this->update($req_data);
                     break;
-                case 'getInfo':
-                    $this->getInfo($req_data);
+                case 'getList':
+                    $this->getList($req_data);
                     break;
                 case 'create':
                     $this->create($req_data);
-                    break;
-                case 'getSitNo':
-                    $this->getSitNo($req_data);
-                    break;
+                    break;             
                 default:
                     Log::error('method not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -57,20 +54,24 @@ class BcsRegisterController extends BaseController {
     }
     
     public function update($req_data){
-        $param = array();
-        isset($req_data['ACCOUNT_NO']) && $param['ACCOUNT_NO'] = $req_data['ACCOUNT_NO'];
-        isset($req_data['ACT_TIME']) && $param['ACT_TIME'] = date('Y-m-d H:i:s',strtotime($req_data['ACT_TIME']));
-        $where = array('SIT_NO' => $req_data['SIT_NO']);
-        if(!$this->model('bcsRegister')->updateBcsRegister($param,$where)){
+        $where = array('id' => $req_data['id']);
+        unset($req_data['id']);
+      
+        if(!$this->model('bcsRegister')->updateBcsRegister($req_data,$where)){
             Log::error('updateBcsRegister fail !');
             EC::fail(EC_UPD_REC);
         }
         EC::success(EC_OK);
     }
     
-    public function getInfo($req_data){
+    public function getList($req_data){
+        $fields  = '*';
+        if(isset($req_data['fields'])){
+            $fields = $req_data['fields'];
+            unset($req_data['fields']);
+        }
         $code_model = $this->model('bcsRegister');
-        $data = $code_model->getInfoBcsRegister($req_data, array());
+        $data = $code_model->getList($req_data, $fields);
         EC::success(EC_OK,$data);
     }
     
@@ -78,24 +79,10 @@ class BcsRegisterController extends BaseController {
         $req_data['id']     = $this->model('id')->getBcsRegisterId();
         $req_data['SIT_NO'] = $this->model('id')->getSitNo();
         
-        $code_model = $this->model('bcsRegister');
-        $data = $code_model->createBcsRegister($req_data);
-        if(false === $data){
+        if(!$this->model('bcsRegister')->createBcsRegister($req_data)){
             Log::error('bcsRegister create Fail!');
             EC::fail(EC_ADD_REC);
         }
-        EC::success(EC_OK,['SIT_NO' => $req_data['SIT_NO']]);
-    }
-
-    private function getSitNo($req_data)
-    {
-        $session = $this->instance('session');
-        if(!$loginUser= $session->get('loginUser')) {
-            Log::bcsError('not Login');
-            EC::fail(EC_NOT_LOGIN);
-        }
-
-        $data = $this->model('bcsRegister')->getSitNo($loginUser['id']);
-        $data ? EC::success(EC_OK,['SIT_NO' => $data ]) : EC::fail(EC_SIT_NO_NON);
+        EC::success(EC_OK,['SIT_NO' => $req_data['SIT_NO'],'id' => $req_data['id']]);
     }
 }

@@ -10,21 +10,7 @@ class UserModel extends Model {
 	public static $_is_delete_true = 2;
 	
 	public function createUser($param = array()){
-		if(! $this->insert(array(
-                				'id'	       => $param['id'],
-                				'account'      => $param['tel'], 
-                				'password'     => $param['password'],
-                		        'nicename'	   => '',
-                		        'pay_password' => '',
-		                        'company_name' => '',
-                				'status'	   => 1,
-		                        'is_delete'    => 1,
-		                        'comment'      => '',
-                				'personal_authentication_status' =>	1,
-								'company_authentication_status'	 =>	1,
-                				'add_timestamp' => date('Y-m-d H:i:s',time())
-                		  ))
-		    ){
+		if(! $this->insert($param)){
 			Log::error('create user error: ' . $this->getErrorNo() . ' : ' . $this->getErrorInfo());
 			return false;
 		}

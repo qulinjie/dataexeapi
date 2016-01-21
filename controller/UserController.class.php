@@ -22,8 +22,8 @@ class UserController extends Controller {
             case "sendSmsCode":
                 $this->sendSmsCode($req_data);
                 break;
-            case "register":
-                $this->register($req_data);
+            case "create":
+                $this->create($req_data);
                 break;            	
 			case 'getList':
 				$this->getList($req_data);
@@ -31,9 +31,9 @@ class UserController extends Controller {
 			case 'update':
 			    $this->update($req_data);
 			    break;	
-		    case 'getInfo':
-		        $this->getInfo($req_data);
-		        break;
+			case 'delete':
+			    $this->delete($req_data);
+			    break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -69,12 +69,6 @@ class UserController extends Controller {
 	    }
 	    
 	    EC::success(EC_OK);  	    
-	}
-	
-	public function getInfo($req_data){
-	    $code_model = $this->model('user');
-	    $data = $code_model->getInfoUser($req_data, array());
-	    EC::success(EC_OK,$data);
 	}
 	
 	public function getSearchCnt($req_data){
@@ -130,21 +124,19 @@ class UserController extends Controller {
 	    //$this->setLoginSession($user_info[0]);
 
 	    $session = Controller::instance('session');
-	    $session->set('loginUser', $user_info[0]);
+	    $session->set('_loginUser', $user_info[0]);
 
 	    Log::notice('end login . sessionId=' . $session->get_id() );
 	    // check
-	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('loginUser')) );
-	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('loginUser')) );
+	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('_loginUser')) );
+	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('_loginUser')) );
 
 	    EC::success(EC_OK,$user_info[0]);
 	}
 
 	private function loginOut(){
 	    try{
-    	    $session = Controller::instance( 'session' );
-    	    $user_id = $session->get('id');
-    	    Log::notice("loginOut . user_id=" . $user_id);
+    	    $session = Controller::instance( 'session' );    
 
     	    $session->clear();//清空session
     	    $session->destroy();//清空session
@@ -154,18 +146,6 @@ class UserController extends Controller {
 	        Log::error('loginOut . e=' . $e->getMessage());
 	    }
 	    EC::success(EC_OK);
-	}
-
-	private function setLoginSession($session_data = array()){
-	    $session = Controller::instance( 'session' );
-	    $session->clear();
-	    $session->set('id', $session_data['id']);
-	    $session->set('tel', $session_data['tel']);
-	    $session->set('auth_id', $session_data['auth_id']);
-	    $session->set('name', $session_data['name']);
-	    //unset( $session_data['password'] );
-		//unset( $session_data['pay_password'] );//支付密码一起删除
-	    $session->set('loginUser', $session_data);
 	}
 
 	public static function buildPassword($id, $pwd){
@@ -181,44 +161,15 @@ class UserController extends Controller {
 	    return $decrypted_pwd ? md5($id . $decrypted_pwd) : false; //为false  表示解密失败
 	}
 
-	private function register($req_data){
-	    //检查验证码
-	    $checkCmsCodeRes = self::checkCmsCode($req_data['tel'],$req_data['code']);
-		$checkCmsCodeRes!= EC_OK && EC::fail($checkCmsCodeRes);
-
-	    //判断用户是否已存在(没注册过或者未被删除)
-	    $user_model = $this->model('user');
-	    $user_data = $user_model->getList(array('account' => $req_data['tel']),array('id','account','status'));
-	    if($user_data || $user_data[0]['is_delete'] == '2'){
-	        Log::error('user exist:' . $req_data['tel']);
-	        EC::fail(EC_USR_EST);
+	private function create($req_data){
+	    $req_data['id'] = $this->model('id')->getUserId();
+	    $req_data['password'] = md5($req_data['id'].$req_data['password']);
+	    if(!$this->model('user')->createUser($req_data)){
+	        Log::error('User create error');
+	        EC::fail(EC_ADD_REC);
 	    }
-
-	    $user_id = $this->model('id')->getUserId();
-		$certification_id = $this->model('id')->getCertificationId();
-	    //密码md5加密
-	    if(!$md5_pwd = UserController::buildPassword($user_id, $req_data['pwd'])){
-			Log::error('password decrypt error');
-			EC::fail(EC_PWD_DEC);
-		}
-
-	    //注册用户写入数据库
-		try{
-			$user_model->startTrans();
-			if(!$user_model->createUser(array('id'=>$user_id,'tel'=>$req_data['tel'],'password'=>$md5_pwd))
-			   ||!$this->model('cert')->createCert(array('id' => $certification_id, 'user_id' => $user_id))){
-				throw new Exception(); //错误信息，底层sql有写文件
-			}
-
-			$user_model->commit();
-		}catch (Exception $e){
-			//注册出错
-			$user_model->rollback();
-			Log::error('add user error!');
-			EC::fail(EC_USR_ADD);
-		}
-
-	    EC::success(EC_OK,array('register_certification_id' => $certification_id));
+		
+	    EC::success(EC_OK,array('id' => $req_data['id']));
 	}
 
 
@@ -340,7 +291,7 @@ class UserController extends Controller {
 	private function getLoginUser($req_data)
 	{
 		$session = self::instance('session');
-		if(!$loginUser = $session->get('loginUser')){
+		if(!$loginUser = $session->get('_loginUser')){
 		    Log::error('User getLoginUser not login');
 			EC::fail(EC_NOT_LOGIN);
 		}
