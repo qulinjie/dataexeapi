@@ -85,21 +85,7 @@ class UserController extends Controller {
 	    $params = $req_data;
 	
 	    $code_model = $this->model('user');
-	    $data = $code_model->getSearchList($params, $current_page, $page_count);
-	    
-	    $cert_model = $this->model('cert');
-	    $fields = array('nicename','legal_name','company_name','business_license');
-	    foreach ($data as $key => $val){
-	        if($cert = $cert_model->getList(array('user_id' => $val['id']),$fields)){
-	            $data[$key] = array_merge($data[$key],$cert[0]);	          
-	        }else{
-	            $data[$key]['nicename']         = '';
-	            $data[$key]['legal_name']       = '';
-	            $data[$key]['company_name']     = '';
-	            $data[$key]['business_license'] = '';
-	        }
-	    }
-	
+	    $data = $code_model->getSearchList($params, $current_page, $page_count);	
 	    EC::success(EC_OK,$data);
 	}
 	
