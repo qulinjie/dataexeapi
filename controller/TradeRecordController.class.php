@@ -79,16 +79,15 @@ class TradeRecordController extends BaseController {
     }
     
     public function create($req_data){
-        $id = $this->model('id')->getTradeRecordId();
-        $req_data['id'] = $id;
-        
+        $id_model = $this->model('id');
         $tradeRecord_model = $this->model('tradeRecord');
+        $tradeRecordItem_model = $this->model('tradeRecordItem');
         $tradeRecord_model->startTrans(); // 事务开始
 
         /*
          * 修改授权码 ，已使用次数 +1
          */
-        $code_model = $this->model('authorizationCode');
+        /* $code_model = $this->model('authorizationCode');
         $params = array();
         $params['used_count'] = ((int)$req_data['code_used_count']) + 1;
         $res = $code_model->updateAuthCode($params,array('id' => $req_data['code_id']));
@@ -96,20 +95,73 @@ class TradeRecordController extends BaseController {
             Log::error('updateAuthCode faild ! rollback .');
             $tradeRecord_model->rollback(); // 事务回滚
             EC::fail(EC_UPD_REC);
-        }
+        } */
         
         /*
-         * 增加 代付款订单  
+         * 增加 付款订单  
          */
-        $data = $tradeRecord_model->createTradeRecord($req_data);
-        if(false === $data){
-            Log::error('createTradeRecord Fail! rollback .');
-            $tradeRecord_model->rollback(); // 事务回滚
-            EC::fail(EC_ADD_REC);
+        
+        foreach ($req_data as $key => $val){
+            Log::notice("createTrade-str .  key=" . $key);
+            $id = $id_model->getTradeRecordId();
+            $params = array();
+            $params['id'] = $id;
+            $params['user_id'] = $val['user_id'];
+            $params['seller_name'] = $val['seller_name'];
+            $params['seller_id'] = $val['seller_id'];
+            $params['order_no'] = $val['order_no'];
+            $params['partner_name'] = $val['partner_name'];
+            $params['partner_tel'] = $val['partner_tel'];
+            $params['partner_company_tel'] = $val['partner_company_tel'];
+            $params['partner_company_name'] = $val['partner_company_name'];
+            $params['order_amount'] = $val['order_amount'];
+            $params['order_bid_amount'] = $val['order_bid_amount'];
+            $params['order_timestamp'] = $val['order_date'];
+            $params['order_status'] = $val['order_status'];
+            
+//             Log::error('----------------------------------trade_record------------------------------params==>>' . var_export($params, true));
+            $data = $tradeRecord_model->createTradeRecord($params);
+            if(false === $data){
+                Log::error('createTradeRecord Fail! rollback . key=' . $key);
+                $tradeRecord_model->rollback(); // 事务回滚
+                EC::fail(EC_ADD_REC);
+            }
+            
+            $seq = 0;
+            foreach ($val['item'] as $item_key => $item_val){
+//                 Log::error('----------------------------------trade_record_item------------------------------params==>>' . var_export($item_val, true));
+                $params_item = array();
+                $seq ++;
+                $params_item['trade_record_id'] = $id;
+                $params_item['id'] = $id_model->getTradeRecordItemId();
+                $params_item['itme_seq'] = $seq;
+                $params_item['order_no'] = $item_val['order_no'];
+                $params_item['itme_no'] = $item_val['itme_no'];
+                $params_item['item_name'] = $item_val['item_name'];
+                $params_item['item_type'] = $item_val['item_type'];
+                $params_item['item_size'] = $item_val['item_size'];
+                $params_item['item_factory'] = $item_val['item_factory'];
+                $params_item['item_count'] = $item_val['item_count'];
+                $params_item['item_weight'] = $item_val['item_weight'];
+                $params_item['item_price'] = $item_val['item_price'];
+                $params_item['bid_price'] = $item_val['bid_price'];
+                $params_item['item_delivery_addr'] = $item_val['item_delivery_addr'];
+                $params_item['item_amount'] = $item_val['item_amount'];
+                $params_item['bid_amount'] = $item_val['bid_amount'];
+                
+                $data = $tradeRecordItem_model->createTradeRecordItem($params_item);
+                if(false === $data){
+                    Log::error('createTradeRecordItem Fail! rollback . key=' . $key);
+                    $tradeRecord_model->rollback(); // 事务回滚
+                    EC::fail(EC_ADD_REC);
+                }
+            }
+            Log::notice("createTrade-end .  key=" . $key . ',id=' . $id);
         }
+        
         $tradeRecord_model->commit(); // 事务提交
         
-        EC::success(EC_OK,$id);
+        EC::success(EC_OK);
     }
     
     public function pay($req_data){
