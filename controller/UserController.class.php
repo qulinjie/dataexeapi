@@ -111,6 +111,9 @@ class UserController extends Controller {
 
 	    //设置已登录
 	    //$this->setLoginSession($user_info[0]);
+	    
+	    $bcsRegister = $this->model('bcsRegister')->getList(array('user_id' => $user_info[0]['id'],'fields' => array('SIT_NO')));
+	    $user_info[0]['SIT_NO'] = $bcsRegister ? $bcsRegister[0]['SIT_NO'] : '';
 
 	    $session = Controller::instance('session');
 	    $session->set('_loginUser', $user_info[0]);
