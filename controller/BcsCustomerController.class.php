@@ -57,11 +57,11 @@ class BcsCustomerController extends BaseController {
     }
     
     public function update($req_data){
-        $id = $req_data['id'];
-        unset($req_data['id']);
+        $user_id = $req_data['user_id'];
+        unset($req_data['user_id']);
     
         $bcsCustomer_model = $this->model('bcsCustomer');
-        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('id' => $id));
+        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
         if(false === $res){
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
