@@ -26,6 +26,9 @@ class BcsCustomerController extends BaseController {
                 case 'create':
                     $this->create($req_data);
                     break;
+                case 'getList':
+                    $this->getList($req_data);
+                    break;
                 default:
                     Log::error('method not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -54,11 +57,11 @@ class BcsCustomerController extends BaseController {
     }
     
     public function update($req_data){
-        $user_id = $req_data['user_id'];
-        unset($req_data['user_id']);
+        $id = $req_data['id'];
+        unset($req_data['id']);
     
         $bcsCustomer_model = $this->model('bcsCustomer');
-        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
+        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('id' => $id));
         if(false === $res){
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
@@ -74,12 +77,17 @@ class BcsCustomerController extends BaseController {
     }
     
     public function create($req_data){
-        $id = $this->model('id')->getBcsCustomerId();
-        $req_data['id'] = $id;
+        $req_data['id'] = $this->model('id')->getBcsCustomerId();
+       
+        if(!$this->model('bcsCustomer')->createBcsCustomer($req_data)){
+            Log::error('create bcsCustomer error');
+            EC::fail(EC_ADD_FAI);
+        }
         
-        $bcsCustomer_model = $this->model('bcsCustomer');
+        EC::success(EC_OK,array('id' =>  $req_data['id']));
+        //调用结束
+        
         $bcsCustomer_model->startTrans(); // 事务开始
-
         /*
          * 修改授权码 ，已使用次数 +1
          */
@@ -105,6 +113,19 @@ class BcsCustomerController extends BaseController {
         $bcsCustomer_model->commit(); // 事务提交
         
         EC::success(EC_OK,$id);
+    }
+    
+    public function getList($req_data)
+    {
+        //默认全部字段
+        $fields = '*';
+        if(isset($req_data['fields'])){
+            $fields = $req_data['fields'];
+            unset($req_data['fields']);
+        }
+    
+        $data = $this->model('bcsCustomer')->getList($req_data,$fields);
+        EC::success(EC_OK,$data);
     }
     
 }
