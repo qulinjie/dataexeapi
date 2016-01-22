@@ -20,7 +20,7 @@ class MessageController extends BaseController
     private function getCnt($req_data)
     {
         $session = self::instance('session');
-        if(!$loginUser = $session->get('loginUser')){
+        if(!$loginUser = $session->get('_loginUser')){
             Log::error('getCnt user not login');
             EC::fail(EC_NOT_LOGIN);
         }
