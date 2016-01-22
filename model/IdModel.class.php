@@ -11,6 +11,7 @@ class IdModel extends Model{
 	protected static $_bcs_child_account_id_offset = 100;
 	protected static $_bcs_register_id_offset = 100;
 	protected static $_sit_no_offset = 100;
+	protected static $_bcs_customer_id_offset = 100;
 
 	public function tableName(){
 		return 'c_id';
@@ -82,5 +83,11 @@ class IdModel extends Model{
 		$sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='sit_no'";
 		$this->execute($sql);
 		return ('DDMG'.str_pad(self::$_sit_no_offset+$this->db->insertId(),5,0,STR_PAD_LEFT));
+	}
+	
+	public function getBcsCustomerId(){
+	    $sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_bcs_customer'";
+	    $this->execute($sql);
+	    return (self::$_bcs_customer_id_offset + $this->db->insertId());
 	}
 }
