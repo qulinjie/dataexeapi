@@ -23,6 +23,9 @@ class BcsRegisterController extends BaseController {
                 case 'getList':
                     $this->getList($req_data);
                     break;
+                case 'getInfo':
+                    $this->getInfo($req_data);
+                    break;
                 case 'create':
                     $this->create($req_data);
                     break;             
@@ -85,4 +88,11 @@ class BcsRegisterController extends BaseController {
         }
         EC::success(EC_OK,['SIT_NO' => $req_data['SIT_NO'],'id' => $req_data['id']]);
     }
+    
+    public function getInfo($req_data){
+        $code_model = $this->model('bcsRegister');
+        $data = $code_model->getInfoBcsRegister($req_data, array());
+        EC::success(EC_OK,$data);
+    }
+    
 }

@@ -108,4 +108,15 @@ class BcsRegisterModel extends Model {
 	    $params && $this->where($params);
 	    return $this->from(null,$fields)->select();
 	}
+
+	public function getInfoBcsRegister($where = array(),$fields = array()){
+	    Log::notice('getInfo ==== >>> where=' . json_encode($where) );
+	    if(empty($fields)){
+	        $data = $this->where($where)->from()->select();
+	    }else{
+	        $data = $this->where($where)->from(null,$fields)->select();
+	    }
+	    return $data;
+	}
+	
 }
