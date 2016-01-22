@@ -179,7 +179,8 @@ class TradeRecordModel extends Model {
 	        'send_timestamp'   =>	$param['send_timestamp'],
 	        'order_timestamp'	=>	$param['order_timestamp'],
 	        'order_status'	=>	$param['order_status'],
-	        'order_bid_amount'	=>	$param['order_status'],
+	        'order_bid_amount'	=>	$param['order_bid_amount'],
+	        'order_new_amount'	=>	$param['order_new_amount'],
 	        'comment'          =>	$param['comment'],
 	        'is_delete'         =>	TradeRecordModel::$_is_delete_false,
 	        'add_timestamp'   =>	date('Y-m-d H:i:s',time())

@@ -102,6 +102,7 @@ class TradeRecordController extends BaseController {
          */
         
         foreach ($req_data as $key => $val){
+//             Log::error('----------------------------------trade_record val------------------------------params==>>' . var_export($val, true));
             Log::notice("createTrade-str .  key=" . $key);
             $id = $id_model->getTradeRecordId();
             $params = array();
@@ -116,6 +117,7 @@ class TradeRecordController extends BaseController {
             $params['partner_company_name'] = $val['partner_company_name'];
             $params['order_amount'] = $val['order_amount'];
             $params['order_bid_amount'] = $val['order_bid_amount'];
+            $params['order_new_amount'] = $val['order_new_amount'];
             $params['order_timestamp'] = $val['order_date'];
             $params['order_status'] = $val['order_status'];
             
