@@ -18,7 +18,7 @@ class TradeRecordItemModel extends Model {
     	    $values[] = TradeRecordItemModel::$_is_delete_false;
 	    }
 	     
-	    $fields = [ 'trade_record_id' ];
+	    $fields = [ 'trade_record_id','ids'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;

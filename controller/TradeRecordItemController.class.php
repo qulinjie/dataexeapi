@@ -18,9 +18,9 @@ class TradeRecordItemController extends BaseController {
                 case 'searchList':
                     $this->getSearchList($req_data);
                     break;
-//                 case 'update':
-//                     $this->update($req_data);
-//                     break;
+                case 'update':
+                     $this->update($req_data);
+                     break;
 //                 case 'getInfo':
 //                     $this->getInfo($req_data);
 //                     break;
@@ -53,12 +53,10 @@ class TradeRecordItemController extends BaseController {
     
     public function update($req_data){
         $id = $req_data['id'];
-        $user_id = $req_data['user_id'];
-        unset($req_data['id']);
-        unset($req_data['user_id']);
+        unset($req_data['id']);       
     
         $tradeRecordItem_model = $this->model('tradeRecordItem');
-        $res = $tradeRecordItem_model->updateTradeRecordItem($req_data,array('id' => $id,'user_id' => $user_id));
+        $res = $tradeRecordItem_model->updateTradeRecordItem($req_data,array('id' => $id));
         if(false === $res){
             Log::error('updateTradeRecordItem faild !');
             EC::fail(EC_UPD_REC);
