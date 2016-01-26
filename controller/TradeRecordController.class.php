@@ -121,7 +121,7 @@ class TradeRecordController extends BaseController {
             $params['order_timestamp'] = $val['order_timestamp'];
             $params['order_status'] = $val['order_status'];
             $params['check_status'] = $val['check_status'];
-            
+            $params['send_status'] = $val['send_status'];
 //             Log::error('----------------------------------trade_record------------------------------params==>>' . var_export($params, true));
             $data = $tradeRecord_model->createTradeRecord($params);
             if(false === $data){
