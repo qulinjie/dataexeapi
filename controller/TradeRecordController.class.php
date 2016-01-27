@@ -194,6 +194,7 @@ class TradeRecordController extends BaseController {
          */
         $params = array();
         $params['order_status'] = $req_data['order_status'];
+        $params['pay_timestamp'] = $req_data['pay_timestamp'];
         $tradeRecord_model = $this->model('tradeRecord');
         $res = $tradeRecord_model->updateTradeRecord($params,array('id' => $id,'user_id' => $user_id));
         if(false === $res){
