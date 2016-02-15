@@ -94,7 +94,7 @@ class UserController extends Controller {
 	
 	private function login($req_data){
 	    $user_model = $this->model('user');
-	    $user_info  = $user_model->getList(array('account' => $req_data['tel'] ),array('id','account','password','pay_password','nicename','company_name','status','is_delete'));
+	    $user_info  = $user_model->getList(array('account' => $req_data['tel'] ),array('id','account','password','pay_password','nicename','company_name','status','is_delete','user_type'));
 
 	    if(!$user_info || $user_info[0]['is_delete'] == '2') {
 	        Log::error('login . user not exsit . ');//用户不存在
