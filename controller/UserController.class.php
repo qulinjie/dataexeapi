@@ -282,12 +282,13 @@ class UserController extends Controller {
 
 	private function getLoginUser($req_data)
 	{
+	    Log::notice("getLoginUser . req_data = ##" . json_encode($req_data) . "##");
 		$session = self::instance('session');
 		if(!$loginUser = $session->get('_loginUser')){
 		    Log::error('User getLoginUser not login');
 			EC::fail(EC_NOT_LOGIN);
 		}
-
+		Log::notice("getLoginUser . loginUser = ##" . json_encode($loginUser) . "##");
 		EC::success(EC_OK,$loginUser);
 	}
 	
