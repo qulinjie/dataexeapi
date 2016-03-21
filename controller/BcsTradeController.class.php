@@ -26,6 +26,9 @@ class BcsTradeController extends BaseController {
                 case 'create':
                     $this->create($req_data);
                     break;
+                case 'create_add':
+                    $this->create_add($req_data);
+                    break;
                 default:
                     Log::error('method not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -87,6 +90,20 @@ class BcsTradeController extends BaseController {
         
         $bcsTrade_model = $this->model('bcsTrade');
         $data = $bcsTrade_model->createBcsTrade($params);
+        if(false === $data){
+            Log::error('createBcsTrade Fail! rollback .');
+            EC::fail(EC_ADD_REC);
+        }
+        EC::success(EC_OK,$id);
+    }
+    
+    public function create_add($req_data){
+        $id = $this->model('id')->getBcsTradeId();
+    
+        $req_data['id'] = $id;
+    
+        $bcsTrade_model = $this->model('bcsTrade');
+        $data = $bcsTrade_model->createBcsTrade($req_data);
         if(false === $data){
             Log::error('createBcsTrade Fail! rollback .');
             EC::fail(EC_ADD_REC);

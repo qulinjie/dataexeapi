@@ -37,6 +37,10 @@ class UserController extends Controller {
 		    case 'getInfo':
 		        $this->getInfo($req_data);
 		        break;
+		        
+	        case 'erp_login':
+	            $this->erp_login($req_data);
+	            break;
             default:
 				Log::error('method not found .');
 				EC::fail(EC_MTD_NON);
@@ -296,6 +300,54 @@ class UserController extends Controller {
 	    $code_model = $this->model('user');
 	    $data = $code_model->getInfoUser($req_data, array());
 	    EC::success(EC_OK,$data);
+	}
+	
+	public function erp_login($req_data){
+	    $pwd = $req_data['data']['userpwd'];
+	    
+	    $conf_arr = Controller::getConfig('conf');
+	    $pi_key = openssl_pkey_get_private($conf_arr['private_key']);
+	    //解析密码
+	    $pwd = base64_decode($pwd);
+	    $decrypted_pwd = '';
+	    //解密密码
+	    openssl_private_decrypt($pwd, $decrypted_pwd, $pi_key);
+	    
+	    Log::notice('--------erp_login------decrypted_pwd---buildPassword-----params==>>' . var_export($decrypted_pwd, true) );
+	    
+	    $req_data['data']['userpwd'] = $decrypted_pwd;
+	    
+	    $code_model = $this->model('curlUser');
+	    
+	    $data = $code_model->erp_login($req_data);
+	    
+	    $user_info = $data['data'];
+	    
+        if( '1' != $user_info['is_partner'] ){
+	        Log::error('login failed . is not is_partner role . login_account=' . $user_info['usercode']);
+	        
+	        $session = Controller::instance( 'session' );    
+    	    $session->clear();//清空session
+    	    $session->destroy();//清空session
+    	    $cookie = $this->instance('cookie');
+    	    $cookie->clear(Router::getBaseUrl());//清空cookie
+    	    
+	        EC::fail(EC_LOGIN_PAR_REC);
+	    }
+	    
+	    $user_info['user_id'] = $user_info['usercode'];
+	    $user_info['account'] = $user_info['usercode'];
+	    $user_info['name'] = $user_info['username'];
+	    
+	    $session = Controller::instance('session');
+	    $session->set('_loginUser', $user_info);
+	    
+	    Log::notice('end login . sessionId=' . $session->get_id() );
+	    // check
+	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('_loginUser')) );
+	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('_loginUser')) );
+	    
+	    EC::success(EC_OK,$user_info);
 	}
 	
 }

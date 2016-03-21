@@ -20,6 +20,9 @@ class BcsCustomerController extends BaseController {
                 case 'update':
                     $this->update($req_data);
                     break;
+                case 'updateBild':
+                    $this->updateBild($req_data);
+                    break;
                 case 'getInfo':
                     $this->getInfo($req_data);
                     break;
@@ -57,11 +60,12 @@ class BcsCustomerController extends BaseController {
     }
     
     public function update($req_data){
-        $user_id = $req_data['user_id'];
+//         $user_id = $req_data['user_id'];
         unset($req_data['user_id']);
     
         $bcsCustomer_model = $this->model('bcsCustomer');
-        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
+//         $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
+        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('ACCOUNT_NO' => $req_data['ACCOUNT_NO']));
         if(false === $res){
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
@@ -126,6 +130,20 @@ class BcsCustomerController extends BaseController {
     
         $data = $this->model('bcsCustomer')->getList($req_data,$fields);
         EC::success(EC_OK,$data);
+    }
+    
+    public function updateBild($req_data){
+        $user_id = $req_data['user_id'];
+        $ACCOUNT_NO = $req_data['ACCOUNT_NO'];
+    
+        $bcsCustomer_model = $this->model('bcsCustomer');
+        $res = $bcsCustomer_model->updateBcsCustomer(array('user_id' => $user_id),array('ACCOUNT_NO' => $ACCOUNT_NO));
+        if(false === $res){
+            Log::error('updateBcsCustomer faild !');
+            EC::fail(EC_UPD_REC);
+        }
+        Log::notice("update=========================================>>>updateBcsCustomer=" . $res);
+        EC::success(EC_OK,$res);
     }
     
 }

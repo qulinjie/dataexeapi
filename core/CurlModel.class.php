@@ -67,7 +67,7 @@ class CurlModel
         
 		// POST发送数据
         curl_setopt( $ch, CURLOPT_POST, true );//发送一个常规的Post请求
-        curl_setopt( $ch,  CURLOPT_POSTFIELDS, json_encode( $data ) );//Post提交的数据包
+        curl_setopt( $ch,  CURLOPT_POSTFIELDS, $data );//Post提交的数据包
     
         // 使用自动跳转
         curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
@@ -210,19 +210,14 @@ class CurlModel
 
 	public function sendRequestErp($interface, $data)
 	{
-        $base_data = array('caller' => 'test', 'callee' => 'ddmg_erp','eventid' => rand() % 10000, 'timestamp' => time());
-        $base_data['data'] = $data;
-    
         Log::error('sendRequestErp====>>>>interface=##' . $interface . '##');
-        Log::error('sendRequestErp====>>>>request_data=##' . json_encode($base_data) . '##');
+        Log::error('sendRequestErp====>>>>request_data=##' . json_encode($data) . '##');
     
-		//getServerErpUrl ==>> http://120.25.1.102:8081/erpinterface/
-        //$ret = self::postRequest(CurlModel::getServerErpUrl() . $interface, json_encode($base_data));
-		//$ret = self::postRequest( 'http://192.168.1.52:8080/erpinterface/' . $interface, json_encode($base_data));
-		$ret = self::postRequest( 'http://120.25.1.102:8081/erpinterface/' . $interface, json_encode($base_data));
+        $header[] = 'Content-type: application/json;charset=UTF-8';
+        
+		$ret = self::postRequest($interface, json_encode($data), $header);
 
-    
-        Log::error('sendRequestErp====>>>>reponse=##' . $ret . '##');
+        Log::error('sendRequestErp====>>>>reponse=##' . json_encode($ret) . '##');
         return $ret;
     }
 	

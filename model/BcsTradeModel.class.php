@@ -18,9 +18,9 @@ class BcsTradeModel extends Model {
 	    $values[] = 1;
 	    
 	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id' ];
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag' ];
 	    foreach ($fields as $key => $val){
-	        if( !$params[$val] ){
+	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
 	            continue;
 	        }
 	        switch ( $val ) {
@@ -80,9 +80,9 @@ class BcsTradeModel extends Model {
 	    
 	    $where = [];
 	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id'];
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag'];
 	    foreach ($fields as $key => $val){
-	        if( !$params[$val] ){
+	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
 	            continue;
 	        }
 	        switch ( $val ) {
@@ -176,6 +176,13 @@ class BcsTradeModel extends Model {
 	        'TRANS_TIME'	=>	$param['TRANS_TIME'],
 	        'comment'	=>	$param['comment'],
 	        'status'	=>	$param['status'],
+	        'shareDate'	=>	$param['shareDate'],
+	        'debitCreditFlag'	=>	$param['debitCreditFlag'],
+	        'accountBalance'	=>	$param['accountBalance'],
+	        'record_bank_type'	=>	$param['record_bank_type'],
+	        'ACCOUNT_NO'	=>	$param['ACCOUNT_NO'],
+	        'oppositeAcctNo'	=>	$param['oppositeAcctNo'],
+	        'oppositeAcctName'	=>	$param['oppositeAcctName'],
 	        'add_timestamp' => date('Y-m-d H:i:s',time())
 	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());

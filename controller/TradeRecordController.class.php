@@ -30,6 +30,13 @@ class TradeRecordController extends BaseController {
                 case 'pay':
                     $this->pay($req_data);
                     break;
+                case 'getNextId':
+                    $this->getNextId($req_data);
+                    break;
+                    
+                case 'create_add':
+                    $this->create_add($req_data);
+                    break;
                 default:
                     Log::error('page not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -204,5 +211,46 @@ class TradeRecordController extends BaseController {
     
         EC::success(EC_OK);
     }
+    
+    public function getNextId(){
+        $id_model = $this->model('id');
+        $id = $id_model->getTradeRecordId();
+        EC::success(EC_OK,$id); 
+    }
+
+    public function create_add($req_data){
+        $id_model = $this->model('id');
+        $tradeRecord_model = $this->model('tradeRecord');
+        $tradeRecordItem_model = $this->model('tradeRecordItem');
+        
+        $tradeRecord_model->startTrans(); // 事务开始
+        
+        $id = $id_model->getTradeRecordId();
+        
+        $req_data['id'] = $id;
+        $data = $tradeRecord_model->createTradeRecord($req_data);
+        if(false === $data){
+            Log::error('createTradeRecord Fail! rollback .' );
+            $tradeRecord_model->rollback(); // 事务回滚
+            EC::fail(EC_ADD_REC);
+        }
+        
+        foreach ($req_data['item'] as $item_key => $item_val){
+            $item_val['trade_record_id'] = $id;
+            $item_val['id'] = $id_model->getTradeRecordItemId();
+            $data = $tradeRecordItem_model->createTradeRecordItem($item_val);
+            if(false === $data){
+                Log::error('createTradeRecordItem Fail! rollback . key=' . $item_key);
+                $tradeRecord_model->rollback(); // 事务回滚
+                EC::fail(EC_ADD_REC);
+            }
+        }
+        
+        $tradeRecord_model->commit(); // 事务提交
+        
+        EC::success(EC_OK);
+    }
+    
+    
     
 }

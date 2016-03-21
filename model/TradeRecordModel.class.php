@@ -164,6 +164,10 @@ class TradeRecordModel extends Model {
 	        'code'         =>	$param['code'],
 	        'seller_id'    =>	$param['seller_id'],
 	        'seller_name'   =>	$param['seller_name'],
+	        'comp_account'   =>	$param['comp_account'],
+	        'bank_name'   =>	$param['bank_name'],
+	        'amount_type'   =>	$param['amount_type'],
+	        'useTodo'   =>	$param['useTodo'],
 	        'partner_name'   =>	$param['partner_name'],
 	        'partner_tel'   =>	$param['partner_tel'],
 	        'partner_company_tel'   =>	$param['partner_company_tel'],
@@ -182,6 +186,7 @@ class TradeRecordModel extends Model {
 	        'order_bid_amount'	=>	$param['order_bid_amount'],
 	        'order_new_amount'	=>	$param['order_new_amount'],
 	        'comment'          =>	$param['comment'],
+	        'record_type'          =>	$param['record_type'],
 	        'is_delete'         =>	TradeRecordModel::$_is_delete_false,
 	        'add_timestamp'   =>	date('Y-m-d H:i:s',time())
 	    ))){

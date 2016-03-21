@@ -114,6 +114,7 @@ class TradeRecordItemModel extends Model {
 	            'bid_price'	        =>	$param['bid_price'],
 	            'bid_amount'	    =>	$param['bid_amount'],
                 'comment'	        =>	$param['comment'],
+	            'record_type'          =>	$param['record_type'],
                 'is_delete'	        =>	TradeRecordItemModel::$_is_delete_false,
                 'add_timestamp'	    =>	date('Y-m-d H:i:s',time())
 	    ))){

@@ -18,6 +18,9 @@ class AdminController extends Controller {
                 case 'changePwd':
                     $this->changePwd($req_data);
                     break;
+                case 'erp_login':
+                    $this->erp_login($req_data);
+                    break;
                 default :
                     Log::error ('page not found . ' . $params[0]);
                     EC::fail (EC_MTD_NON);
@@ -126,6 +129,51 @@ class AdminController extends Controller {
             EC::fail(EC_UPD_REC);
         }
         EC::success(EC_OK);
+    }
+    
+    
+    public function erp_login($req_data){
+        $login_account = $req_data['data']['loginid'];
+        $pwd = $req_data['data']['userpwd'];
+         
+        $conf_arr = Controller::getConfig('conf');
+        $pi_key = openssl_pkey_get_private($conf_arr['private_key']);
+        //解析密码
+        $pwd = base64_decode($pwd);
+        $decrypted_pwd = '';
+        //解密密码
+        openssl_private_decrypt($pwd, $decrypted_pwd, $pi_key);
+         
+        Log::notice('--------erp_login------decrypted_pwd---buildPassword-----params==>>' . var_export($decrypted_pwd, true) );
+         
+        $req_data['data']['userpwd'] = $decrypted_pwd;
+         
+        $code_model = $this->model('curlUser');
+         
+        $data = $code_model->erp_login($req_data);
+         
+        $user_info = $data['data'];
+         
+        $session = Controller::instance('session');
+        $session->set('loginUser', $user_info);
+        
+        if( '1' != $user_info['is_paymanage'] ){
+            Log::error('login failed . is not admin role . login_account=' . $login_account);
+            
+            $session = Controller::instance('session');
+            $session->delete('loginUser');
+            $session->clear();
+            
+            EC::fail(EC_LOGIN_PAR_REC);
+        }
+        $user_info['user_id'] = $user_info['usercode'];
+        $user_info['account'] = $user_info['usercode'];
+        $user_info['name'] = $user_info['username'];
+        $user_info['is_admin'] = 'yes';
+        
+        $this->setLoginSession($user_info);
+        Log::notice('login success . login_account=' . $user_info['user_id']);
+        EC::success(EC_OK,$user_info);
     }
     
 }

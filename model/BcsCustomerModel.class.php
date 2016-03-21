@@ -41,7 +41,7 @@ class BcsCustomerModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2'];
+	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2', 'record_bank_type', 'user_id'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
