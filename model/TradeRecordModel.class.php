@@ -172,6 +172,7 @@ class TradeRecordModel extends Model {
 	        'partner_tel'   =>	$param['partner_tel'],
 	        'partner_company_tel'   =>	$param['partner_company_tel'],
 	        'partner_company_name'   =>	$param['partner_company_name'],
+	        'apply_no'         =>	$param['apply_no'],
 	        'order_no'         =>	$param['order_no'],
 	        'order_amount'     =>	$param['order_amount'],
 	        'order_timestamp'   =>	$param['order_timestamp'],
