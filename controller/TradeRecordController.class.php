@@ -37,6 +37,9 @@ class TradeRecordController extends BaseController {
                 case 'create_add':
                     $this->create_add($req_data);
                     break;
+                case 'auditOneTradRecord':
+                    $this->auditOneTradRecord($req_data);
+                    break;
                 default:
                     Log::error('page not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -251,6 +254,34 @@ class TradeRecordController extends BaseController {
         EC::success(EC_OK);
     }
     
+    public function auditOneTradRecord($req_data){
+    	$tradeRecord_model = $this->model('tradeRecord');    	
+    	
+    	$id = intval($req_data['id']);
+    	$apply_status = intval($req_data['apply_status']); //审批状态  1待审批  2审批通过 3审批驳回	
+    	Log::notice('tradeRecord-auditOneTradRecord . id=' . $id . ',apply_status=' . $apply_status . ',req_data==>>' . var_export($req_data, true));
+    	
+    	if(!in_array($apply_status, array(1,2,3))){
+    		Log::error('apply_status is error!');
+    		EC::fail(EC_PAR_ERR);
+    	}
+    	
+    	$data = $tradeRecord_model->getInfoTradeRecord(array('id' => $id));
+    	if(empty($data)) {
+    		Log::error('getInfo empty !');
+    		EC::fail(EC_RED_EMP);
+    	}
+    	
+    	$params = array();
+    	$params['apply_status'] = $apply_status; 
+    	$params['apply_timestamp'] = time();   	
+    	$res = $tradeRecord_model->updateTradeRecord($params, array('id' => $id));
+        if(false === $res){
+            Log::error('updateTradeRecord faild !');
+            EC::fail(EC_UPD_REC);
+        }
     
+        EC::success(EC_OK);
+    }
     
 }
