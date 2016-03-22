@@ -127,7 +127,8 @@ class BcsTradeModel extends Model {
 	    if($page && $count){
 	        $model->pageLimit($page, $count);
 	    }
-	    return $model->order('add_timestamp desc')->select();
+// 	    return $model->order('add_timestamp desc')->select();
+	    return $model->order('TRANS_TIME desc')->select();
 	}
 	
 	public function updateBcsTrade($param, $where){
