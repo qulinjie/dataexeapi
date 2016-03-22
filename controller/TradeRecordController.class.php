@@ -273,8 +273,11 @@ class TradeRecordController extends BaseController {
     	}
     	
     	$params = array();
-    	$params['apply_status'] = $apply_status; 
-    	$params['apply_timestamp'] = time();   	
+    	$params['apply_status'] = $apply_status;
+    	if(2 == $apply_status){
+    		$params['order_status'] = 1; //对审批通过的改订单状态为待付款
+    	}
+    	$params['apply_timestamp'] = $req_data['apply_timestamp'];   	
     	$res = $tradeRecord_model->updateTradeRecord($params, array('id' => $id));
         if(false === $res){
             Log::error('updateTradeRecord faild !');
