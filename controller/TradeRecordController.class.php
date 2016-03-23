@@ -68,13 +68,20 @@ class TradeRecordController extends BaseController {
     }
     
     public function update($req_data){
+    	$where = array();
+    	
         $id = $req_data['id'];
-        $user_id = $req_data['user_id'];
         unset($req_data['id']);
-        unset($req_data['user_id']);
+        $where['id'] = $id;
+        
+        if(isset($req_data['user_id'])){
+        	$user_id = $req_data['user_id'];
+        	unset($req_data['user_id']);
+        	$where['user_id'] = $user_id;
+        }
     
         $tradeRecord_model = $this->model('tradeRecord');
-        $res = $tradeRecord_model->updateTradeRecord($req_data,array('id' => $id,'user_id' => $user_id));
+        $res = $tradeRecord_model->updateTradeRecord($req_data, $where);
         if(false === $res){
             Log::error('updateTradeRecord faild !');
             EC::fail(EC_UPD_REC);
