@@ -186,7 +186,7 @@ class TradeRecordModel extends Model {
 	        'send_status'      =>	$param['send_status'],
 	        'send_timestamp'   =>	$param['send_timestamp'],
 	        'order_timestamp'	=>	$param['order_timestamp'],
-	        'order_status'	=>	1, //订单交易状态 1-待付款 2-已付款 
+	        'order_status'	=>	$param['order_status'],
 	        'order_bid_amount'	=>	$param['order_bid_amount'],
 	        'order_new_amount'	=>	$param['order_new_amount'],
 	        'comment'          =>	$param['comment'],
