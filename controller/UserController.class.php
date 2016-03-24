@@ -335,6 +335,7 @@ class UserController extends Controller {
 	        EC::fail(EC_LOGIN_PAR_REC);
 	    }
 	    
+	    $user_info['id'] = $user_info['usercode'];
 	    $user_info['user_id'] = $user_info['usercode'];
 	    $user_info['account'] = $user_info['usercode'];
 	    $user_info['name'] = $user_info['username'];

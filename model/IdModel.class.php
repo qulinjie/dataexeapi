@@ -12,7 +12,8 @@ class IdModel extends Model{
 	protected static $_bcs_register_id_offset = 100;
 	protected static $_sit_no_offset = 100;
 	protected static $_bcs_customer_id_offset = 100;
-
+	protected static $_spd_internet_bank_id_offset = 100;
+	
 	public function tableName(){
 		return 'c_id';
 	}
@@ -90,4 +91,13 @@ class IdModel extends Model{
 	    $this->execute($sql);
 	    return (self::$_bcs_customer_id_offset + $this->db->insertId());
 	}
+	
+	public function getSpdInternetBankId(){
+	    $sql = "update " . $this->tableName() . " set id = LAST_INSERT_ID(id +1) where name='c_spd_internet_bank'";
+	    $this->execute($sql);
+	    return (self::$_spd_internet_bank_id_offset + $this->db->insertId());
+	}
+	
+	
+	
 }

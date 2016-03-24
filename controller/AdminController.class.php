@@ -83,6 +83,7 @@ class AdminController extends Controller {
         }
         
         $loginUser['is_admin'] = 'yes';
+        $loginUser['id'] = $loginUser['usercode'];
         
         $this->setLoginSession($loginUser);
         Log::notice('login success . login_account=' . $login_account);
