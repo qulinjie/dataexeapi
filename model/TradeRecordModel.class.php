@@ -192,7 +192,15 @@ class TradeRecordModel extends Model {
 	        'comment'          =>	$param['comment'],
 	        'record_type'          =>	$param['record_type'],
 	        'is_delete'         =>	TradeRecordModel::$_is_delete_false,
-	        'add_timestamp'   =>	date('Y-m-d H:i:s',time())
+	        'add_timestamp'   =>	date('Y-m-d H:i:s',time()),	    		
+	    	'bank_no'       => $param['bank_no'],
+	    	'bank_flag'       => $param['bank_flag'],
+	    	'local_flag'       => $param['local_flag'],
+	    	'erp_fgsdm'       => $param['erp_fgsdm'],
+	    	'erp_bmdm'        => $param['erp_bmdm'],
+	    	'erp_fgsmc'       => $param['erp_fgsmc'],
+	    	'erp_bmmc'        => $param['erp_bmmc'],
+	    	'erp_username'    => $param['erp_username']
 	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
 	        return false;
