@@ -117,7 +117,7 @@ class TradeRecordItemModel extends Model {
 	            'record_type'          =>	$param['record_type'],
                 'is_delete'	        =>	TradeRecordItemModel::$_is_delete_false,
                 'add_timestamp'	    =>	date('Y-m-d H:i:s',time()),
-	    		'itme_comp_name_buyer'	=>	$param['itme_comp_name_buyer']
+	    		'item_comp_name_buyer'	=>	$param['item_comp_name_buyer']
 	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
 	        return false;
