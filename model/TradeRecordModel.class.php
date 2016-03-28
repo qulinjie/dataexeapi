@@ -23,7 +23,7 @@ class TradeRecordModel extends Model {
     	    $values[] = TradeRecordModel::$_is_delete_false;
 	    }
 	     
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete', 'seller_id',
+	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 'apply_status', 'is_delete', 'seller_id',
 	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
 	        'ACCOUNT_NO'
 	    ];
@@ -32,6 +32,10 @@ class TradeRecordModel extends Model {
 	            continue;
 	        }
 	        switch ( $val ) {
+	        	case 'order_no':
+	        		$keys[] = "{$val} like ?";
+	        		$values[] = '%' . $params[$val] . '%';
+	        		break;
 	            case 'time1':
 	                $keys[] = "add_timestamp >= ?";
 	                $values[] = $params[$val];
@@ -59,7 +63,7 @@ class TradeRecordModel extends Model {
                 case 'order_sum_amount2':
                     $keys[] = "order_sum_amount <= ?";
                     $values[] = $params[$val];
-                    break;
+                    break;               
                 case 'order_status':
                     if('9' == $params[$val]){
                         $keys[] = 'order_status in ( ' . TradeRecordModel::$_status_paid . ',' . TradeRecordModel::$_status_refuse . ' ) and \'1\'=? ';
@@ -81,8 +85,8 @@ class TradeRecordModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','is_delete', 'seller_id',
-	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
+	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','apply_status','is_delete', 'seller_id',
+	        'backhost_status', 'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
 	        'ACCOUNT_NO'
 	    ];
 	    foreach ($fields as $key => $val){
@@ -90,6 +94,16 @@ class TradeRecordModel extends Model {
 	            continue;
 	        }
 	        switch ( $val ) {
+	        	case 'backhost_status':
+	        		if(00 == backhost_status){
+	        			$where[] = "{$val}='0'";
+	        		}else{
+	        			$where[] = "{$val}='{$params[$val]}'";
+	        		}
+	        		break;
+	        	case 'order_no':	        		
+	        		$where[] = "{$val} like '%{$params[$val]}%'";
+	        		break;
 	            case 'time1':
 	                $where[] = "add_timestamp >= '{$params[$val]}'";
 	                break;
@@ -111,11 +125,11 @@ class TradeRecordModel extends Model {
                 case 'order_sum_amount2':
                     $where[] = "order_sum_amount <= '{$params[$val]}'";
                     break;
-                case 'order_status':
+                /* case 'order_status':
                     if('9' == $params[$val]){
                         $where[] = 'order_status in ( ' . TradeRecordModel::$_status_paid . ',' . TradeRecordModel::$_status_refuse . ' ) ';
                         break;
-                    }
+                    } */
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
