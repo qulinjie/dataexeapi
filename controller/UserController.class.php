@@ -288,7 +288,8 @@ class UserController extends Controller {
 	{
 	    Log::notice("getLoginUser . req_data = ##" . json_encode($req_data) . "##");
 		$session = self::instance('session');
-		if(!$loginUser = $session->get('_loginUser')){
+		$loginUser = empty($session->get('loginUser')) ? $session->get('_loginUser') : $session->get('loginUser');
+		if(!$loginUser){
 		    Log::error('User getLoginUser not login');
 			EC::fail(EC_NOT_LOGIN);
 		}
