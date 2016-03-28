@@ -184,6 +184,8 @@ class BcsTradeModel extends Model {
 	        'ACCOUNT_NO'	=>	$param['ACCOUNT_NO'],
 	        'oppositeAcctNo'	=>	$param['oppositeAcctNo'],
 	        'oppositeAcctName'	=>	$param['oppositeAcctName'],
+	        'payeeBankNo'	=>	$param['payeeBankNo'],
+	        'payeeBankName'	=>	$param['payeeBankName'],
 	        'add_timestamp' => date('Y-m-d H:i:s',time())
 	    ))){
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
