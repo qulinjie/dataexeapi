@@ -266,9 +266,10 @@ class TradeRecordController extends BaseController {
     	
     	$id = intval($req_data['id']);
     	$apply_status = intval($req_data['apply_status']); //审批状态  1待审批  2审批通过 3审批驳回	
-    	Log::notice('tradeRecord-auditOneTradRecord . id=' . $id . ',apply_status=' . $apply_status . ',req_data==>>' . var_export($req_data, true));
+    	$audit_level = intval($req_data['audit_level']); //1一级审批 ， 2 二级审批
+    	Log::notice('tradeRecord-auditOneTradRecord . id=' . $id . ',apply_status=' . $apply_status . ',audit_level=' . $audit_level . ',req_data==>>' . var_export($req_data, true));
     	
-    	if(!in_array($apply_status, array(1,2,3))){
+    	if(!in_array($apply_status, array(1,2,3,4,5,6))){
     		Log::error('apply_status is error!');
     		EC::fail(EC_PAR_ERR);
     	}
@@ -281,10 +282,16 @@ class TradeRecordController extends BaseController {
     	
     	$params = array();
     	$params['apply_status'] = $apply_status;
-    	if(2 == $apply_status){
+    	if(5 == $apply_status && 2 == $audit_level){
     		$params['order_status'] = 1; //对审批通过的改订单状态为待付款
     	}
-    	$params['apply_timestamp'] = $req_data['apply_timestamp'];   	
+    	if(1 == $audit_level){
+    		$params['apply_timestamp_first'] = $req_data['apply_timestamp'];
+    	}
+    	if(2 == $audit_level){
+    		$params['apply_timestamp_second'] = $req_data['apply_timestamp'];
+    	}
+    	   	
     	$res = $tradeRecord_model->updateTradeRecord($params, array('id' => $id));
         if(false === $res){
             Log::error('updateTradeRecord faild !');
