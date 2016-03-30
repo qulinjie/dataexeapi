@@ -185,7 +185,9 @@ class TradeRecordModel extends Model {
 	    Log::notice('create ==== >>> param=' . json_encode($param) );
 	    if(! $this->insert(array(
 	        'id'           =>	$param['id'],
-	        'user_id'      =>	$param['user_id'],
+	        'user_id'      =>	$param['user_id'],	    	
+	    	'audit_user_id_first'    =>	$param['audit_user_id_first'],
+	    	'audit_user_id_second'   =>	$param['audit_user_id_second'],
 	        'ACCOUNT_NO'   =>	$param['ACCOUNT_NO'],
 	        'code'         =>	$param['code'],
 	        'seller_id'    =>	$param['seller_id'],
