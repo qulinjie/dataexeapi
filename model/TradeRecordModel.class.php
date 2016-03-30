@@ -23,7 +23,7 @@ class TradeRecordModel extends Model {
     	    $values[] = TradeRecordModel::$_is_delete_false;
 	    }
 	     
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status', 'apply_status', 'is_delete', 'seller_id',
+	    $fields = [ 'order_no', 'user_id', 'audit_user_id_first', 'audit_user_id_second', 'code', 'time1', 'time2','type','order_status', 'apply_status', 'is_delete', 'seller_id',
 	        'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
 	        'ACCOUNT_NO'
 	    ];
@@ -32,6 +32,12 @@ class TradeRecordModel extends Model {
 	            continue;
 	        }
 	        switch ( $val ) {
+	        	/* case 'user_id':
+	        		$keys[] = "(user_id=? or audit_user_id_first=? or audit_user_id_second =?)";
+	        		$values[] = $params[$val];
+	        		$values[] = $params[$val];
+	        		$values[] = $params[$val];
+	        		break; */
 	        	case 'order_no':
 	        		$keys[] = "{$val} like ?";
 	        		$values[] = '%' . $params[$val] . '%';
@@ -69,7 +75,7 @@ class TradeRecordModel extends Model {
                         $keys[] = 'order_status in ( ' . TradeRecordModel::$_status_paid . ',' . TradeRecordModel::$_status_refuse . ' ) and \'1\'=? ';
                         $values[] = '1';
                         break;
-                    }
+                    }                
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
@@ -85,7 +91,7 @@ class TradeRecordModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'order_no', 'user_id', 'code', 'time1', 'time2','type','order_status','apply_status','is_delete', 'seller_id',
+	    $fields = [ 'order_no', 'user_id', 'audit_user_id_first', 'audit_user_id_second', 'code', 'time1', 'time2','type','order_status','apply_status','is_delete', 'seller_id',
 	        'backhost_status', 'order_time1', 'order_time2', 'seller_name', 'seller_conn_name', 'order_sum_amount1', 'order_sum_amount2',
 	        'ACCOUNT_NO'
 	    ];
@@ -94,6 +100,9 @@ class TradeRecordModel extends Model {
 	            continue;
 	        }
 	        switch ( $val ) {
+	        	/* case 'user_id':	        		
+	        		$where[] = "(user_id='{$params[$val]}' or audit_user_id_first='{$params[$val]}' or audit_user_id_second='{$params[$val]}')";
+	        		break; */
 	        	case 'backhost_status':
 	        		if(00 == backhost_status){
 	        			$where[] = "{$val}='0'";
