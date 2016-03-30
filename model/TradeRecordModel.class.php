@@ -190,6 +190,7 @@ class TradeRecordModel extends Model {
 	        'code'         =>	$param['code'],
 	        'seller_id'    =>	$param['seller_id'],
 	        'seller_name'   =>	$param['seller_name'],
+	    	'seller_name_code'   =>	$param['seller_name_code'],
 	        'comp_account'   =>	$param['comp_account'],
 	        'bank_name'   =>	$param['bank_name'],
 	        'amount_type'   =>	$param['amount_type'],
