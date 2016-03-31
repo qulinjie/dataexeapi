@@ -86,7 +86,7 @@ class db_mysqli extends Base {
 
     	Log::notice('sql:' . $sql);
     	
-    	Log::write($sql, 'debug', 'sql-'.date('Y-m-d'));
+    	//Log::write($sql, 'debug', 'sql-'.date('Y-m-d'));
         
         //参数分析
         if (!$sql) {
