@@ -1,6 +1,8 @@
 <?php
 class AdminController extends Controller {
 
+	public static $adminSessionKey = 'loginUser'; //admin的session键名
+	
     public function handle($params = array(), $req_data = array()) {
         if(empty($params)){
             EC::fail (EC_MTD_NON);
@@ -32,8 +34,8 @@ class AdminController extends Controller {
     public static function isLogin($req_data)
     {
         $session = Controller::instance('session');
-        if($session->is_set('loginUser')){
-            EC::success(EC_OK,$session->get('loginUser'));
+        if($session->is_set(self::$adminSessionKey)){
+            EC::success(EC_OK,$session->get(self::$adminSessionKey));
         }
         Log::error('isLogin . session[loginUser] is not set . id=' . $session->get_id() );
         EC::fail(EC_OTH);
@@ -47,7 +49,7 @@ class AdminController extends Controller {
     
     protected function loginOut(){
         $session = Controller::instance('session');
-        $session->delete('loginUser');
+        $session->delete(self::$adminSessionKey);
         $session->clear();
         EC::success(EC_OK);
     }
@@ -101,8 +103,8 @@ class AdminController extends Controller {
         $session->set('loginUser', $loginUser);
         Log::notice('end setLoginSession . sessionId=' . $session->get_id() );
         // check
-        Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('loginUser')) );
-        Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('loginUser')) );
+        Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set(self::$adminSessionKey)) );
+        Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get(self::$adminSessionKey)) );
     }
     
     public function changePwd($req_data){

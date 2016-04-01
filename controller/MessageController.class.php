@@ -20,7 +20,7 @@ class MessageController extends BaseController
     private function getCnt($req_data)
     {
         $session = self::instance('session');
-        if(!$loginUser = $session->get('_loginUser')){
+        if(!$loginUser = $session->get(UserController::$userSessionKey)){
             Log::error('getCnt user not login');
             EC::fail(EC_NOT_LOGIN);
         }
@@ -31,7 +31,7 @@ class MessageController extends BaseController
     private function searchList($req_data)
     {
         $session = self::instance('session');
-        if(!$loginUser = $session->get('_loginUser')){
+        if(!$loginUser = $session->get(UserController::$userSessionKey)){
             Log::error('getCnt user not login');
             EC::fail(EC_NOT_LOGIN);
         }

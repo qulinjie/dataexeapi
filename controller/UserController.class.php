@@ -1,6 +1,8 @@
 <?php
 
 class UserController extends Controller {
+	
+	public static $userSessionKey = '_loginUser';
 
     public function handle($params = array(), $req_data = array()) {
         switch ($params[0]) {
@@ -120,12 +122,12 @@ class UserController extends Controller {
 	    $user_info[0]['SIT_NO'] = $bcsRegister ? $bcsRegister[0]['SIT_NO'] : '';
 
 	    $session = Controller::instance('session');
-	    $session->set('_loginUser', $user_info[0]);
+	    $session->set(self::$userSessionKey, $user_info[0]);
 
 	    Log::notice('end login . sessionId=' . $session->get_id() );
 	    // check
-	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('_loginUser')) );
-	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('_loginUser')) );
+	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set(self::$userSessionKey)) );
+	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get(self::$userSessionKey)) );
 
 	    EC::success(EC_OK,$user_info[0]);
 	}
@@ -288,7 +290,7 @@ class UserController extends Controller {
 	{
 	    Log::notice("getLoginUser . req_data = ##" . json_encode($req_data) . "##");
 		$session = self::instance('session');
-		$loginUser = empty($session->get('loginUser')) ? $session->get('_loginUser') : $session->get('loginUser');
+		$loginUser = empty($session->get('loginUser')) ? $session->get(self::$userSessionKey) : $session->get('loginUser');
 		if(!$loginUser){
 		    Log::error('User getLoginUser not login');
 			EC::fail(EC_NOT_LOGIN);
@@ -342,12 +344,12 @@ class UserController extends Controller {
 	    $user_info['name'] = $user_info['username'];
 	    
 	    $session = Controller::instance('session');
-	    $session->set('_loginUser', $user_info);
+	    $session->set(self::$userSessionKey, $user_info);
 	    
 	    Log::notice('end login . sessionId=' . $session->get_id() );
 	    // check
-	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set('_loginUser')) );
-	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get('_loginUser')) );
+	    Log::notice('check setLoginSession . is_set[loginUser]=' . ($session->is_set(self::$userSessionKey)) );
+	    Log::notice('check setLoginSession . get[loginUser]=' . json_encode($session->get(self::$userSessionKey)) );
 	    
 	    EC::success(EC_OK,$user_info);
 	}
