@@ -6,9 +6,6 @@ class TestController extends BaseController
     public function handle( $params=[] )
     {
 		if ( !$params ) {
-			//$this->test();
-			//$this->markTest();
-			//$this->testGet();
 			$this->laiyifa();
 
 		} else 
