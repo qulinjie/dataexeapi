@@ -6,7 +6,7 @@ class TestController extends BaseController
     public function handle( $params=[] )
     {
 		if ( !$params ) {
-// 			$this->laiyifa();
+			$this->laiyifa();
 		} else 
         switch( $params[0] )
         {
