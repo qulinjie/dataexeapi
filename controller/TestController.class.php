@@ -7,7 +7,6 @@ class TestController extends BaseController
     {
 		if ( !$params ) {
 			$this->laiyifa();
-
 		} else 
         switch( $params[0] )
         {
