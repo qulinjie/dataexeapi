@@ -5,6 +5,7 @@ return array(
 	'username' => 'root',
 	'password' => 'Dahan123',
 	'dbname'   => 'ddmg_pay_platform',
+//     'dbname'   => 'ddmg_pay_test',
 	'driver'   => 'mysqli',
 	'charset'  => 'utf8'
 );
