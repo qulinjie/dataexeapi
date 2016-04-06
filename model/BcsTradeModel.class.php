@@ -17,22 +17,26 @@ class BcsTradeModel extends Model {
 	    $keys[] = 'is_delete = ?';
 	    $values[] = 1;
 	    
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag' ];
+	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag','oppositeAcctName' ];
 	    foreach ($fields as $key => $val){
 	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
 	            continue;
 	        }
 	        switch ( $val ) {
 	            case 'time1':
-	                $keys[] = "add_timestamp >= ?";
+	                $keys[] = "TRANS_TIME >= ?";
 	                $values[] = $params[$val];
 	                break;
 	            case 'time2':
-	                $keys[] = "add_timestamp <= ?";
+	                $keys[] = "TRANS_TIME <= ?";
 	                $values[] = $params[$val];
 	                break;
                 case 'seller_name':
+                    $keys[] = "{$val} like ?";
+                    $values[] = '%' . $params[$val] . '%';
+                    break;
+                case 'oppositeAcctName':
                     $keys[] = "{$val} like ?";
                     $values[] = '%' . $params[$val] . '%';
                     break;
@@ -52,7 +56,7 @@ class BcsTradeModel extends Model {
 	    }
 	    
 	    
-	    if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
+	    /* if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
 	        $s_user_id_str = '';
 	        foreach ($params['s_user_id_list'] as $val){
 	            $s_user_id_str =  $s_user_id_str . $val . ',';
@@ -67,7 +71,7 @@ class BcsTradeModel extends Model {
 	        }
 	        $keys[] = 'b_user_id in ( ' . substr($b_user_id_str,0,-1) .' ) and \'1\'=? ';
 	        $values[] = '1';
-	    }
+	    } */
 	    
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
@@ -79,20 +83,23 @@ class BcsTradeModel extends Model {
 	    Log::notice('getSearchList ==== >>> $params=' . json_encode($params) );
 	    
 	    $where = [];
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag'];
+	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
+                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag','oppositeAcctName'];
 	    foreach ($fields as $key => $val){
 	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
 	            continue;
 	        }
 	        switch ( $val ) {
 	            case 'time1':
-	                $where[] = "add_timestamp >= '{$params[$val]}'";
+	                $where[] = "TRANS_TIME >= '{$params[$val]}'";
 	                break;
 	            case 'time2':
-	                $where[] = "add_timestamp <= '{$params[$val]}'";
+	                $where[] = "TRANS_TIME <= '{$params[$val]}'";
 	                break;
                 case 'seller_name':
+                    $where[] = "{$val} like '%{$params[$val]}%'";
+                    break;
+                case 'oppositeAcctName':
                     $where[] = "{$val} like '%{$params[$val]}%'";
                     break;
                 case 'amount1':
@@ -117,12 +124,12 @@ class BcsTradeModel extends Model {
 	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
 	    $model->where( $where );
 	    
-	    if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
+	    /* if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
 	        $model->where(array('s_user_id' => $params['s_user_id_list']));
 	    }
 	    if($params['b_user_id_list'] && !empty($params['b_user_id_list']) ){
 	        $model->where(array('b_user_id' => $params['b_user_id_list']));
-	    }
+	    } */
 	    
 	    if($page && $count){
 	        $model->pageLimit($page, $count);
