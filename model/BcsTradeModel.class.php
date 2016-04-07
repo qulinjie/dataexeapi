@@ -10,69 +10,90 @@ class BcsTradeModel extends Model {
 	public static $_status_failed = 2;
 	public static $_status_unknown = 3;
 	
+	public static function getSearchkeysValues($params){
+		$keys = array();
+		$values = array();
+		
+		$keys[] = 'is_delete = ?';
+		$values[] = 1;
+		 
+		$fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
+		'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO', 'debitCreditFlag', 'oppositeAcctName' ];
+		foreach ($fields as $key => $val){
+			if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
+				continue;
+			}
+			switch ( $val ) {
+				case 'time1':
+					$keys[] = "TRANS_TIME >= ?";
+					$values[] = $params[$val];
+					break;
+				case 'time2':
+					$keys[] = "TRANS_TIME <= ?";
+					$values[] = $params[$val];
+					break;
+				case 'seller_name':
+					$keys[] = "{$val} like ?";
+					$values[] = '%' . $params[$val] . '%';
+					break;
+				case 'oppositeAcctName':
+					$keys[] = "{$val} like ?";
+					$values[] = '%' . $params[$val] . '%';
+					break;
+				case 'amount1':
+					$keys[] = "TX_AMT >= ?";
+					$values[] = $params[$val];
+					break;
+				case 'amount2':
+					$keys[] = "TX_AMT <= ?";
+					$values[] = $params[$val];
+					break;
+				case 'status':
+					if('31' == $params[$val]){
+						$keys[] = 'status in ( ' . self::$_status_unknown . ',' . self::$_status_success . ' ) and \'1\'=? ';
+						$values[] = 1;
+						break;
+					}
+				default:
+					$keys[] = "{$val}=?";
+					$values[] = $params[$val];
+					break;
+					
+				/* if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
+				 $s_user_id_str = '';
+				foreach ($params['s_user_id_list'] as $val){
+				$s_user_id_str =  $s_user_id_str . $val . ',';
+				}
+				$keys[] = 's_user_id in ( ' . substr($s_user_id_str,0,-1) .' ) and \'1\'=? ';
+				$values[] = '1';
+				}
+				if($params['b_user_id_list'] && !empty($params['b_user_id_list']) ){
+				$b_user_id_str = '';
+				foreach ($params['b_user_id_list'] as $val){
+				$b_user_id_str =  $b_user_id_str . $val . ',';
+				}
+				$keys[] = 'b_user_id in ( ' . substr($b_user_id_str,0,-1) .' ) and \'1\'=? ';
+				$values[] = '1';
+				} */
+					
+			}
+		}
+		
+		return array('keys' => $keys, 'values' => $values);
+	}
+	
 	public function getSearchCnt($params = array()){
 	    $keys = array();
 	    $values = array();
 	     
-	    $keys[] = 'is_delete = ?';
-	    $values[] = 1;
-	    
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag','oppositeAcctName' ];
-	    foreach ($fields as $key => $val){
-	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
-	            continue;
-	        }
-	        switch ( $val ) {
-	            case 'time1':
-	                $keys[] = "TRANS_TIME >= ?";
-	                $values[] = $params[$val];
-	                break;
-	            case 'time2':
-	                $keys[] = "TRANS_TIME <= ?";
-	                $values[] = $params[$val];
-	                break;
-                case 'seller_name':
-                    $keys[] = "{$val} like ?";
-                    $values[] = '%' . $params[$val] . '%';
-                    break;
-                case 'oppositeAcctName':
-                    $keys[] = "{$val} like ?";
-                    $values[] = '%' . $params[$val] . '%';
-                    break;
-                case 'amount1':
-                    $keys[] = "TX_AMT >= ?";
-                    $values[] = $params[$val];
-                    break;
-                case 'amount2':
-                    $keys[] = "TX_AMT <= ?";
-                    $values[] = $params[$val];
-                    break;
-	            default:
-	                $keys[] = "{$val}=?";
-	                $values[] = $params[$val];
-	                break;
-	        }
+	    $kv_arr = self::getSearchkeysValues($params);
+	    if(is_array($kv_arr) && isset($kv_arr['keys'])){
+	    	$keys = $kv_arr['keys'];
 	    }
-	    
-	    
-	    /* if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
-	        $s_user_id_str = '';
-	        foreach ($params['s_user_id_list'] as $val){
-	            $s_user_id_str =  $s_user_id_str . $val . ',';
-	        }
-	        $keys[] = 's_user_id in ( ' . substr($s_user_id_str,0,-1) .' ) and \'1\'=? ';
-	        $values[] = '1';
+	    if(is_array($kv_arr) && isset($kv_arr['values'])){
+	    	$values = $kv_arr['values'];
 	    }
-	    if($params['b_user_id_list'] && !empty($params['b_user_id_list']) ){
-	        $b_user_id_str = '';
-	        foreach ($params['b_user_id_list'] as $val){
-	            $b_user_id_str =  $b_user_id_str . $val . ',';
-	        }
-	        $keys[] = 'b_user_id in ( ' . substr($b_user_id_str,0,-1) .' ) and \'1\'=? ';
-	        $values[] = '1';
-	    } */
-	    
+	    	
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
 	}
@@ -82,47 +103,19 @@ class BcsTradeModel extends Model {
 	    
 	    Log::notice('getSearchList ==== >>> $params=' . json_encode($params) );
 	    
-	    $where = [];
-	    $fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
-                    'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO','debitCreditFlag','oppositeAcctName'];
-	    foreach ($fields as $key => $val){
-	        if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
-	            continue;
-	        }
-	        switch ( $val ) {
-	            case 'time1':
-	                $where[] = "TRANS_TIME >= '{$params[$val]}'";
-	                break;
-	            case 'time2':
-	                $where[] = "TRANS_TIME <= '{$params[$val]}'";
-	                break;
-                case 'seller_name':
-                    $where[] = "{$val} like '%{$params[$val]}%'";
-                    break;
-                case 'oppositeAcctName':
-                    $where[] = "{$val} like '%{$params[$val]}%'";
-                    break;
-                case 'amount1':
-                    $where[] = "TX_AMT >= '{$params[$val]}'";
-                    break;
-                case 'amount2':
-                    $where[] = "TX_AMT <= '{$params[$val]}'";
-                    break;
-                case 'status':
-                    if('31' == $params[$val]){
-                        $where[] = 'status in ( ' .BcsTradeModel::$_status_unknown . ',' . BcsTradeModel::$_status_success . ' ) ';
-                        break;
-                    }
-	            default:
-	                $where[] = "{$val}='{$params[$val]}'";
-	                break;
-	        }
+	    $keys = array();
+	    $values = array();
+	    
+	    $kv_arr = self::getSearchkeysValues($params);
+	    if(is_array($kv_arr) && isset($kv_arr['keys'])){
+	    	$keys = $kv_arr['keys'];
+	    }
+	    if(is_array($kv_arr) && isset($kv_arr['values'])){
+	    	$values = $kv_arr['values'];
 	    }
 	    
-	    $where[] = "is_delete = 1";
-	    
-	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
-	    $model->where( $where );
+	    Log::notice('getSearchList ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
+	    $model->where( $keys , $values);
 	    
 	    /* if($params['s_user_id_list'] && !empty($params['s_user_id_list']) ){
 	        $model->where(array('s_user_id' => $params['s_user_id_list']));
