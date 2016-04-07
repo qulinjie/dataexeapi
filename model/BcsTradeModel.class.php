@@ -156,7 +156,19 @@ class BcsTradeModel extends Model {
 	
 	public function createBcsTrade($param = array()){
 	    Log::notice('create ==== >>> param=' . json_encode($param) );
-	    if(! $this->insert(array(
+	    
+	    $returnInsertId = true;
+	    if(isset($param['id'])) $returnInsertId = false;
+	    if(!isset($param['add_timestamp'])) $param['add_timestamp'] =  date('Y-m-d H:i:s',time());
+	     
+	    if(true && !$insertId = $this->insert($param, $returnInsertId)){
+	    	Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
+	    	return false;
+	    }
+	    if(isset($param['id'])) $insertId = $param['id'];
+	    return $insertId;
+	    
+	    /* if(! $this->insert(array(
 	        'id'   =>	$param['id'],
 	        'order_id' => $param['order_id'],
 	        'order_no' => $param['order_no'],
@@ -191,7 +203,7 @@ class BcsTradeModel extends Model {
 	        Log::error('create record err . ErrorNo=' . $this->getErrorNo() . ' ,ErrorInfo=' . $this->getErrorInfo());
 	        return false;
 	    }
-	    return true;
+	    return true; */
 	}
 	
 }
