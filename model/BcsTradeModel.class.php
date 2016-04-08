@@ -17,7 +17,7 @@ class BcsTradeModel extends Model {
 		$keys[] = 'is_delete = ?';
 		$values[] = 1;
 		 
-		$fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO',
+		$fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO', 'shareDate1', 'shareDate2',
 		'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO', 'debitCreditFlag', 'oppositeAcctName' ];
 		foreach ($fields as $key => $val){
 			if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
@@ -32,6 +32,14 @@ class BcsTradeModel extends Model {
 					$keys[] = "TRANS_TIME <= ?";
 					$values[] = $params[$val];
 					break;
+				case 'shareDate1':
+				    $keys[] = "shareDate >= ?";
+				    $values[] = $params[$val];
+				    break;
+				case 'shareDate2':
+				    $keys[] = "shareDate <= ?";
+				    $values[] = $params[$val];
+				    break;
 				case 'seller_name':
 					$keys[] = "{$val} like ?";
 					$values[] = '%' . $params[$val] . '%';

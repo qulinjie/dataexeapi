@@ -53,6 +53,11 @@ class BcsCustomerModel extends Model {
 	            case 'time2':
 	                $where[] = "add_timestamp <= '{$params[$val]}'";
 	                break;
+                case 'user_id':
+                    if( '-2' == strval($params[$val]) ){
+                        $where[] = "user_id != '-1'";
+                        break;
+                    }
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;
