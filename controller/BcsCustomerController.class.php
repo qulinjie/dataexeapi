@@ -134,10 +134,12 @@ class BcsCustomerController extends BaseController {
     
     public function updateBild($req_data){
         $user_id = $req_data['user_id'];
+        $user_name = $req_data['user_name'];
+        
         $ACCOUNT_NO = $req_data['ACCOUNT_NO'];
     
         $bcsCustomer_model = $this->model('bcsCustomer');
-        $res = $bcsCustomer_model->updateBcsCustomer(array('user_id' => $user_id),array('ACCOUNT_NO' => $ACCOUNT_NO));
+        $res = $bcsCustomer_model->updateBcsCustomer(array('user_id' => $user_id),array('user_name' => $user_name),array('ACCOUNT_NO' => $ACCOUNT_NO));
         if(false === $res){
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
