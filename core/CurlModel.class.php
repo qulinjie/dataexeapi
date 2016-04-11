@@ -76,6 +76,12 @@ class CurlModel
     
 		// 执行发送CURL
         $response = curl_exec( $ch );
+//         Log::notice("curl_exec data ===========================>> response = ##" . $response . "##" );
+        if(curl_errno($ch))
+        {
+            Log::notice("curl_exec data ===========================>> response = ##" . curl_error($ch) . "##" );
+            echo 'curl http query error: ' . curl_error($ch) . '<BR>';
+        }
 		//print_r( $response );
 		//exit;
         $httpCode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
