@@ -9,69 +9,74 @@ class SpdInternetBankModel extends Model {
 	public static $_is_delete_false = 1;
 	public static $_is_delete_true = 2;
 	
+	public static function getSearchkeysValues($params){
+		
+		Log::notice('getSearchkeysValues ==== >>> params=' . json_encode($params));
+		
+		$keys = array();
+		$values = array();
+		 
+		if(empty($params['is_delete']) ){
+			$keys[] = 'is_delete = ?';
+			$values[] = self::$_is_delete_false;
+		}
+		 
+		$fields = ['bankName', 'bankNo', 'super_bank_id', 'city_id'];
+		 
+		foreach ($fields as $key => $val){
+			if( !$params[$val] ){
+				continue;
+			}
+			switch ( $val ) {
+				case 'bankName':
+					$keys[] = "{$val} like ?";
+					$values[] = '%' . $params[$val] . '%';
+					break;
+				default:
+					$keys[] = "{$val}=?";
+					$values[] = $params[$val];
+					break;
+			}				
+		}
+		
+		return array('keys' => $keys, 'values' => $values);
+	}			
+	
 	public function getSearchCnt($params = array()){
-	    $keys = array();
-	    $values = array();
-	    
-	    $keys[] = 'is_delete = ?';
-	    $values[] = SpdInternetBankModel::$_is_delete_false;
-	    
-	    $fields = ['bankName', 'bankNo'];
-	    foreach ($fields as $key => $val){
-	        if( !$params[$val] ){
-	            continue;
-	        }
-	        switch ( $val ) {
-                case 'bankName':
-                    $keys[] = "{$val} like ?";
-                    $values[] = '%' . $params[$val] . '%';
-                    break;
-	            case 'bankNo':
-	                $keys[] = "bankNo = ?";
-	                $values[] = $params[$val];
-	                break;
-	            default:
-	                $keys[] = "{$val}=?";
-	                $values[] = $params[$val];
-	                break;
-	        }
-	    }
-	    
-	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
-	    return $this->count(null, 'id', $keys, $values);
+		
+		$keys = array();
+		$values = array();
+		 
+		$kv_arr = self::getSearchkeysValues($params);
+		if(is_array($kv_arr) && isset($kv_arr['keys'])){
+			$keys = $kv_arr['keys'];
+		}
+		if(is_array($kv_arr) && isset($kv_arr['values'])){
+			$values = $kv_arr['values'];
+		}
+		
+		Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
+		return $this->count(null, 'id', $keys, $values);		
 	}
 	
 	public function getSearchList($params = array(), $page = null, $count = null){
-	    $model = $this->from();
-	    
-	    $where = [];
-	    $fields = ['bankName', 'bankNo'];
-	    foreach ($fields as $key => $val){
-	        if( !$params[$val] ){
-	            continue;
-	        }
-	        switch ( $val ) {
-	            case 'bankName':
-	                $where[] = "{$val} like '%{$params[$val]}%'";
-	                break;
-                case 'bankNo':
-                    $where[] = "bankNo = '{$params[$val]}'";
-                    break;
-	            default:
-	                $where[] = "{$val}='{$params[$val]}'";
-	                break;
-	        }
-	    }
-	    
-	    $where[] = 'is_delete=1'; // 1-正常 2-删除
-	    
-	    Log::notice('getSearchList ==== >>> where=' . json_encode($where) );
-	    $model->where( $where );
-	    
-	    if($page && $count){
-	        $model->pageLimit($page, $count);
-	    }
-	    return $model->order('add_timestamp desc')->select();
+		$model = $this->from();
+		
+		$kv_arr = self::getSearchkeysValues($params);
+		if(is_array($kv_arr) && isset($kv_arr['keys'])){
+			$keys = $kv_arr['keys'];
+		}
+		if(is_array($kv_arr) && isset($kv_arr['values'])){
+			$values = $kv_arr['values'];
+		}
+		 
+		Log::notice('getSearchList ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
+		$model->where( $keys , $values);
+		
+		if($page && $count){
+			$model->pageLimit($page, $count);
+		}
+		return $model->order('add_timestamp desc')->select();
 	}
 	
 	public function updateSpdInterBank($param, $where){
