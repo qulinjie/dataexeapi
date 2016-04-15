@@ -12,7 +12,7 @@ class BcsCustomerModel extends Model {
 	    $keys[] = 'is_delete = ?';
 	    $values[] = 1;
 	     
-	$fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2'];
+	$fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2','USER_NAME'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -26,6 +26,10 @@ class BcsCustomerModel extends Model {
 	                $keys[] = "add_timestamp <= ?";
 	                $values[] = $params[$val];
 	                break;
+				case 'USER_NAME':
+					$keys[]   = "user_name LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
 	            default:
 	                $keys[] = "{$val}=?";
 	                $values[] = $params[$val];
@@ -41,7 +45,7 @@ class BcsCustomerModel extends Model {
 	    $model = $this->from();
 	     
 	    $where = [];
-	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2', 'record_bank_type', 'user_id'];
+	    $fields = [ 'status', 'SIT_NO', 'ACCOUNT_NO', 'time1', 'time2', 'record_bank_type', 'user_id','USER_NAME'];
 	    foreach ($fields as $key => $val){
 	        if( !$params[$val] ){
 	            continue;
@@ -58,6 +62,9 @@ class BcsCustomerModel extends Model {
                         $where[] = "user_id != '-1'";
                         break;
                     }
+				case 'USER_NAME':
+					$where[] = " user_name LIKE '%".$params[$val]."%'";
+					break;
 	            default:
 	                $where[] = "{$val}='{$params[$val]}'";
 	                break;

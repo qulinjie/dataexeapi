@@ -81,8 +81,10 @@ class BcsCustomerController extends BaseController {
     }
     
     public function create($req_data){
+        $bcsCustomer_model = $this->model('bcsCustomer');
         $req_data['id'] = $this->model('id')->getBcsCustomerId();
-       
+        $req_data['user_fgs_dm'] = $req_data['user_fgs_dm'];
+
         if(!$this->model('bcsCustomer')->createBcsCustomer($req_data)){
             Log::error('create bcsCustomer error');
             EC::fail(EC_ADD_FAI);
