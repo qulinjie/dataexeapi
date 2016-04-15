@@ -543,7 +543,6 @@ class Model extends Base {
      *
      */
     public function where($where, $value = null) {
-
         return $this->_where($where, $value, true);
     }
 
@@ -866,6 +865,7 @@ class Model extends Base {
                 unset($this->_parts[$partName]);
             }
         }
+file_put_contents("D:/aabb.txt",$sqlStr);
         return ($allLines == true) ? $this->db->getArray($sqlStr) : $this->db->fetchRow($sqlStr);
     }
 
@@ -1238,7 +1238,7 @@ class Model extends Base {
         $this->where($where, $params);
         $sqlStr .= $this->_parts['where'];
         unset($this->_parts['where']);
-
+//file_put_contents("D:/sqlsql.txt",$sqlStr);
         return $this->db->query($sqlStr);
     }
 

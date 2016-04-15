@@ -107,7 +107,32 @@ class TradeRecordModel extends Model {
 	    if(is_array($kv_arr) && isset($kv_arr['values'])){
 	    	$values = $kv_arr['values'];
 	    }
-	     
+
+		$fields = [ 'amount1', 'amount2','amount_type','erp_fgsmc'];
+		foreach ($fields as $key => $val){
+			if( !$params[$val] ){
+				continue;
+			}
+			switch ( $val ) {
+				case 'amount1':
+					$keys[] = "order_bid_amount >= ?";
+					$values[] = $params[$val];
+					break;
+				case 'amount2':
+					$keys[] = "order_bid_amount <= ?";
+					$values[] = $params[$val];
+					break;
+				case 'amount_type':
+					$keys[]   = "amount_type LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
+				case 'erp_fgsmc':
+					$keys[] = "erp_fgsmc LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
+			}
+		}
+
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
 	}
@@ -122,7 +147,32 @@ class TradeRecordModel extends Model {
 	    if(is_array($kv_arr) && isset($kv_arr['values'])){
 	    	$values = $kv_arr['values'];
 	    }
-	    
+
+		$fields = [ 'amount1', 'amount2','amount_type','erp_fgsmc'];
+		foreach ($fields as $key => $val){
+			if( !$params[$val] ){
+				continue;
+			}
+			switch ( $val ) {
+				case 'amount1':
+					$keys[] = "order_bid_amount >= ?";
+					$values[] = $params[$val];
+					break;
+				case 'amount2':
+					$keys[] = "order_bid_amount <= ?";
+					$values[] = $params[$val];
+					break;
+				case 'amount_type':
+					$keys[]   = "amount_type LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
+				case 'erp_fgsmc':
+					$keys[] = "erp_fgsmc LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
+			}
+		}
+
 	    Log::notice('getSearchList ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    $model->where( $keys , $values);
 	     
