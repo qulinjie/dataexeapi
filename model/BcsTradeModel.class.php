@@ -18,7 +18,8 @@ class BcsTradeModel extends Model {
 		$values[] = 1;
 		 
 		$fields = [ 'b_user_id', 'seller_name', 'time1', 'time2', 'order_no', 'status','MCH_TRANS_NO', 'shareDate1', 'shareDate2',
-		'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO', 'debitCreditFlag', 'oppositeAcctName' ];
+		'FMS_TRANS_NO', 'seller_name', 'amount1', 'amount2', 'order_id', 'ACCOUNT_NO', 'debitCreditFlag', 'oppositeAcctName', 
+		'txamt1', 'txamt2','paybankname','erpfgsdm'	];
 		foreach ($fields as $key => $val){
 			if( 0 == strlen(strval($params[$val])) && !$params[$val] ){
 				continue;
@@ -62,6 +63,22 @@ class BcsTradeModel extends Model {
 						$values[] = 1;
 						break;
 					}
+				case 'txamt1':
+					$keys[] = "TX_AMT >= ?";
+					$values[] = $params[$val];
+					break;
+				case 'txamt2':
+					$keys[] = "TX_AMT <= ?";
+					$values[] = $params[$val];
+					break;
+				case 'paybankname':
+					$keys[]   = "payeeBankName LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
+				case 'erpfgsdm':
+					$keys[]   = "erp_fgsdm LIKE ?";
+					$values[] = '%'.$params[$val].'%';
+					break;
 				default:
 					$keys[] = "{$val}=?";
 					$values[] = $params[$val];
@@ -102,31 +119,6 @@ class BcsTradeModel extends Model {
 	    	$values = $kv_arr['values'];
 	    }
 
-		$fields = [ 'txamt1', 'txamt2','paybankname','erpfgsdm'];
-		foreach ($fields as $key => $val){
-			if( !$params[$val] ){
-				continue;
-			}
-			switch ( $val ) {
-				case 'txamt1':
-					$keys[] = "TX_AMT >= ?";
-					$values[] = $params[$val];
-					break;
-				case 'txamt2':
-					$keys[] = "TX_AMT <= ?";
-					$values[] = $params[$val];
-					break;
-				case 'paybankname':
-					$keys[]   = "payeeBankName LIKE ?";
-					$values[] = '%'.$params[$val].'%';
-					break;
-				case 'erpfgsdm':
-					$keys[]   = "erp_fgsdm LIKE ?";
-					$values[] = '%'.$params[$val].'%';
-					break;
-			}
-		}
-
 	    Log::notice('getSearchCnt ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    return $this->count(null, 'id', $keys, $values);
 	}
@@ -146,31 +138,6 @@ class BcsTradeModel extends Model {
 	    if(is_array($kv_arr) && isset($kv_arr['values'])){
 	    	$values = $kv_arr['values'];
 	    }
-
-		$fields = [ 'txamt1', 'txamt2','paybankname','erpfgsdm'];
-		foreach ($fields as $key => $val){
-			if( !$params[$val] ){
-				continue;
-			}
-			switch ( $val ) {
-				case 'txamt1':
-					$keys[] = "TX_AMT >= ?";
-					$values[] = $params[$val];
-					break;
-				case 'txamt2':
-					$keys[] = "TX_AMT <= ?";
-					$values[] = $params[$val];
-					break;
-				case 'paybankname':
-					$keys[]   = "payeeBankName LIKE ?";
-					$values[] = '%'.$params[$val].'%';
-					break;
-				case 'erpfgsdm':
-					$keys[]   = "erp_fgsdm LIKE ?";
-					$values[] = '%'.$params[$val].'%';
-					break;
-			}
-		}
 
 	    Log::notice('getSearchList ==== >>> keys=' . json_encode($keys) . ',values=' . json_encode($values) );
 	    $model->where( $keys , $values);
