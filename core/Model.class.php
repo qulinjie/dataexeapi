@@ -865,7 +865,7 @@ class Model extends Base {
                 unset($this->_parts[$partName]);
             }
         }
-file_put_contents("D:/aabb.txt",$sqlStr);
+
         return ($allLines == true) ? $this->db->getArray($sqlStr) : $this->db->fetchRow($sqlStr);
     }
 
