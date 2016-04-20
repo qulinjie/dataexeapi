@@ -32,6 +32,9 @@ class BcsCustomerController extends BaseController {
                 case 'getList':
                     $this->getList($req_data);
                     break;
+                case 'delete':
+                    $this->delete($req_data);
+                    break;
                 default:
                     Log::error('method not found . ' . $params[0]);
                     EC::fail(EC_MTD_NON);
@@ -61,11 +64,16 @@ class BcsCustomerController extends BaseController {
     
     public function update($req_data){
 //         $user_id = $req_data['user_id'];
-        unset($req_data['user_id']);
+        //unset($req_data['user_id']);
     
         $bcsCustomer_model = $this->model('bcsCustomer');
 //         $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('user_id' => $user_id));
-        $res = $bcsCustomer_model->updateBcsCustomer($req_data,array('ACCOUNT_NO' => $req_data['ACCOUNT_NO']));
+        if(array_key_exists('id',$req_data)) {
+            $whereArr = array('id'=> $req_data['id']);
+        } else {
+            $whereArr = array('ACCOUNT_NO' => $req_data['ACCOUNT_NO']);
+        }
+        $res = $bcsCustomer_model->updateBcsCustomer($req_data,$whereArr);
         if(false === $res){
             Log::error('updateBcsCustomer faild !');
             EC::fail(EC_UPD_REC);
@@ -73,7 +81,17 @@ class BcsCustomerController extends BaseController {
         Log::notice("update=========================================>>>updateBcsCustomer=" . $res);
         EC::success(EC_OK,$res);
     }
-    
+
+    //增加删除方法
+    public function delete($req_data) {
+        $bcsCustomer_model = $this->model('bcsCustomer');
+        $res = $bcsCustomer_model->deleteBcsCustomer($req_data,array('id' => $req_data['id']));
+        if(false === $res){
+            EC::fail(EC_UPD_REC);
+        }
+        EC::success(EC_OK,$res);
+    }
+
     public function getInfo($req_data){
         $code_model = $this->model('bcsCustomer');
         $data = $code_model->getInfoBcsCustomer($req_data, array());

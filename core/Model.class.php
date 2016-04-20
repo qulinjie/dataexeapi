@@ -1238,7 +1238,6 @@ class Model extends Base {
         $this->where($where, $params);
         $sqlStr .= $this->_parts['where'];
         unset($this->_parts['where']);
-//file_put_contents("D:/sqlsql.txt",$sqlStr);
         return $this->db->query($sqlStr);
     }
 
@@ -1281,7 +1280,7 @@ class Model extends Base {
         $this->where($where, $value);
         $sqlStr .= $this->_parts['where'];
         unset($this->_parts['where']);
-
+file_put_contents("D:/sql.txt",$sqlStr);
         return $this->db->query($sqlStr);
     }
 

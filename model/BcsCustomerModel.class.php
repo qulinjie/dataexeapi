@@ -94,6 +94,15 @@ class BcsCustomerModel extends Model {
 	    }
 	    return $this->update($param, $where);
 	}
+
+	//删除多余用户
+	public function deleteBcsCustomer($param,$where) {
+		if(empty($where)) {
+			return false;
+		}
+		return $this->delete($where);
+	}
+
 	
 	public function getInfoBcsCustomer($where = array(),$fields = array()){
 	    Log::notice('getInfo ==== >>> where=' . json_encode($where) );
